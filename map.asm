@@ -43,7 +43,7 @@ MainLoop:
     jsr WaitForFrame
     jmp MainLoop
     rts
-  
+     
 GrabNew:
     // check if new apple available
     ldy counter
@@ -288,7 +288,10 @@ Init:
     sta $01
     
     // enable vic bank 3
-    lda $dd00ff
+    lda $dd00
+    and #%111111100
+    sta $dd00
+
     // setup character memory and screen memory
     lda #%00001100
     sta $d018
@@ -421,7 +424,7 @@ Apples:
     .byte 00
 
 WaitingApples:
-    .byte 00, 00, $11, 00, $11, $00, $00, $00, $0c, $00, $00, $0d, $1a, $00, $00, $1c, $00, $00, $00, $12, $00, $10, $00, $ff, $0d, $11, 00, $10, $ff, 00, $11, 00, 00, 00, 00, 00, 00, $1a, 00, 00, 00, 00, $11, 00, 00, $0c, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, $ff
+    .byte 00, 00, $11, 00, $11, $00, $00, $00, $0c, $00, $00, $0d, $12, $00, $00, $1c, $00, $00, $00, $12, $00, $10, $00, $ff, $0d, $11, 00, $10, $ff, 00, $11, 00, 00, 00, 00, 00, 00, $1a, 00, 00, 00, 00, $11, 00, 00, $0c, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, $ff
 * = $f000 "Charset"
 .import binary "assets/lolo/chars.bin"
 
