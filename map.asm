@@ -20,6 +20,8 @@ BasicUpstart2($cc00)
     playerY:    .byte $d0
     counter:    .byte 00
     currentA:   .byte 00
+    stack:      .byte 00
+    appleslen:  .byte 00
 
 * = $cc00
 Start:
@@ -34,82 +36,29 @@ MainLoop:
     jsr ReadJoy
     jsr CheckCollisions
     jsr ScrollScreen
-    jsr DrawApples
+    jsr APPLES.draw
     jsr AnimateTurtle
 
     ldy #$ff
     jsr WaitForFrame
-    inc counter
     jmp MainLoop
     rts
-
-MoveApples:
-    ldx #00
-    ldy #00
-!Loop:
-    lda Apples,x
-    sta temp
-    lda Apples+1,x
-    clc
-    adc #$c0
-    sta temp + 1
-    lda #$03
-    sta (temp),y
-
-    lda Apples+1,x
-    clc
-    adc #$d8
-    sta temp + 1
-    lda #$cc
-    sta (temp),y
-
-    clc
-    lda Apples,x
+  
+GrabNew:
+    // check if new apple available
+    ldy counter
+    lda WaitingApples,y
     cmp #$ff
-    beq !++
-    adc #$28
-    sta Apples,x
-    lda Apples+1,x
-    adc #00
-    sta Apples+1,x
-    cmp #$03
     bne !+
-    lda Apples,x
-    cmp #$e8
-    bcc !+
-    lda #$ff
-    sta Apples,x
-!:
-    inx
-    inx
-    jmp !Loop-
-!:
+    ldy #$ff
+    sty counter
+    jsr APPLES.shift
     rts
-    
-DrawApples:
-    ldy #00
-    ldx #00
-!Loop:
-    lda Apples,x
-    sta temp
-    lda Apples+1,x
-    clc
-    adc #$c0
-    sta temp + 1
-    lda #$0e
-    ora #%01000000
-    sta (temp),y
-    lda Apples+1,x
-    clc
-    adc #$d8
-    sta temp + 1
-    lda #$02
-    sta (temp),y
-    inx
-    inx
-    lda Apples,x
-    cmp #$ff
-    bne !Loop-
+!:
+    cmp #$00
+    beq !+
+        jsr APPLES.add
+!:
     rts
     
 CheckCollisions:
@@ -209,13 +158,15 @@ ScrollScreen:
     ldx offset
     cpx #$01
     bne !+
-    jsr MoveApples
+    jsr APPLES.check_last
+    jsr APPLES.move
+    jsr GrabNew
 !:  
     ldx offset
     cpx #$07
     bne !+
     ldx #00
-    
+    inc counter
 !:
     inx
     stx offset 
@@ -337,10 +288,7 @@ Init:
     sta $01
     
     // enable vic bank 3
-    lda $dd00
-    and #%111111100
-    sta $dd00
-
+    lda $dd00ff
     // setup character memory and screen memory
     lda #%00001100
     sta $d018
@@ -377,6 +325,13 @@ Init:
     lda #$c4
     sta bufferAddress + 1
     cli
+    jsr APPLES.init
+    // lda #$0c
+    // ldx #$00
+    // jsr APPLES.add
+    // lda #$11
+    // ldx #$00
+    // jsr APPLES.add
     rts
 
 DrawScreen:    
@@ -459,9 +414,14 @@ Map:
 .import binary "assets/lolo/map.bin"
 Colors:
 .import binary "assets/lolo/colors.bin"
-Apples:
-    .byte $b0, $00, $a5, $01, $ff, 00
 
+.import source "apples.asm"
+
+Apples:
+    .byte 00
+
+WaitingApples:
+    .byte 00, 00, $11, 00, $11, $00, $00, $00, $0c, $00, $00, $0d, $1a, $00, $00, $1c, $00, $00, $00, $12, $00, $10, $00, $ff, $0d, $11, 00, $10, $ff, 00, $11, 00, 00, 00, 00, 00, 00, $1a, 00, 00, 00, 00, $11, 00, 00, $0c, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, $ff
 * = $f000 "Charset"
 .import binary "assets/lolo/chars.bin"
 
