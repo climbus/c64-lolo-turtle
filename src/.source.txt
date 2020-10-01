@@ -1,4 +1,4 @@
-BasicUpstart2($cc00)
+BasicUpstart2(Start)
 
     .label col=$11
     .label row=$12
@@ -9,9 +9,13 @@ BasicUpstart2($cc00)
 
     .label SPRITE_0_X = $d000
     .label SPRITE_0_Y = $d001
+    .label SPRITE_1_X = $d002
+    .label SPRITE_1_Y = $d003
+    
     .label JOY_PORT_2 = $dc00
     .label JOY_LT = %00100
     .label JOY_RT = %01000
+
 
     offset:		.byte 00
     delay:		.byte 00
@@ -22,13 +26,28 @@ BasicUpstart2($cc00)
     currentA:   .byte 00
     stack:      .byte 00
     appleslen:  .byte 00
+    points:     .byte 00
+    
+.import source "apples.asm"
 
-* = $cc00
+Map:
+.import binary "assets/map.bin"
+
+Colors:
+.import binary "assets/colors.bin"
+
+Apples:
+    .byte 00
+
+WaitingApples:
+    .byte 00, 00, 00, $11, 00, $00, $00, $00, $0c, $00, $00, $00, $00, $00, $0c, $0d, $12, $00, $00, $1c, $00, $00, $00, $12, $00, $10, $00, $ff
+
 Start:
-
     jsr Init
     jsr DrawScreen
     jsr MainLoop
+    rts
+    
 
 MainLoop:
     ldy #$00
@@ -38,6 +57,7 @@ MainLoop:
     jsr ScrollScreen
     jsr APPLES.draw
     jsr AnimateTurtle
+    jsr HidePoints
 
     ldy #$ff
     jsr WaitForFrame
@@ -103,12 +123,50 @@ CheckCollisions:
     ldx #00
     lda (playerScreenPosition, x)
 
+    cmp #$4e
+    bne !+
+        lda playerScreenPosition + 1
+        sbc #$c0
+        tax
+        lda playerScreenPosition
+        jsr APPLES.remove
+        jsr ShowPoints
+        rts
+!:
     cmp #$03
     beq !+
     lda platerLastPosition
     sta playerX
     sta SPRITE_0_X
+    rts
 !:
+    rts
+
+ShowPoints:
+    lda playerX
+    adc #20
+    sta SPRITE_1_X
+    lda playerY
+    sbc #15
+    sta SPRITE_1_Y
+    lda $d015
+    ora #%00000010
+    sta $d015
+    lda #20
+    sta points
+    rts
+
+HidePoints:
+    ldx points
+    cpx #$00
+    beq !+
+        dex
+        stx points
+        rts
+!:
+    lda $d015
+    and #%11111101
+    sta $d015
     rts
     
 ReadJoy:
@@ -190,68 +248,6 @@ SwitchBuffer:
     sta bufferAddress + 1
     rts
     
-MoveBuffer:
-    lda #12
-    sta row
-    lda #20
-    sta col
-
-    sta BUFFER + 1
-    adc #$28
-    sta BUFFER + 4
-
-    
-    lda bufferAddress + 1 //c0, c4
-    sta BUFFER + 5
-    cmp #$c4
-    beq !+
-    lda #$c4
-    jmp !++
-!:
-    lda #$c0
-!:
-    sta BUFFER + 2 //c4, c0
-
-    
-!RowLoop:
-    lda #$00
-    sta col
-
-!ColLoop:
-BUFFER:
-    lda $c400
-    sta $c428
-    
-    clc
-    lda BUFFER + 1
-    adc #$01
-    sta BUFFER + 1
-
-    lda BUFFER + 2
-    adc #$00
-    sta BUFFER + 2
-
-    clc
-    lda BUFFER + 4
-    adc #$01
-    sta BUFFER + 4
-
-    lda BUFFER + 5
-    adc #$00
-    sta BUFFER + 5
-
-    inc col
-    ldx col
-    cpx #40
-    bne !ColLoop-
-         
-    inc row
-
-    ldx row
-    cpx #24
-    bne !RowLoop-
-    rts
-    
 WaitForFrame: 
     lda $d012
     sty temp
@@ -296,13 +292,17 @@ Init:
     lda #%00001100
     sta $d018
 
-    // point sprite
+    // point sprites
     lda #$80
     sta $c3f8
     sta $c7f8
 
+    lda #$88
+    sta $c3f9
+    sta $c7f9
+
     // enable sprites
-    lda #%11111111
+    lda #%11111101
     sta $d015
 
     // sprite #1 colors
@@ -312,8 +312,11 @@ Init:
     lda #BLUE
     sta $d026
 
+    lda #YELLOW
+    sta $d028
+
     // multicolor sprites
-    lda #$FF
+    lda #%10000001
     sta $d01c
 
     // sprite coordinates
@@ -323,18 +326,11 @@ Init:
     lda playerY
     sta SPRITE_0_Y
 
-    lda #$00
-    sta bufferAddress
-    lda #$c4
-    sta bufferAddress + 1
-    cli
+    lda #200
+    sta SPRITE_1_X
+    sta SPRITE_1_Y
+
     jsr APPLES.init
-    // lda #$0c
-    // ldx #$00
-    // jsr APPLES.add
-    // lda #$11
-    // ldx #$00
-    // jsr APPLES.add
     rts
 
 DrawScreen:    
@@ -411,22 +407,9 @@ COLOR:
     cpx #$28
     bne !-
     rts
-    
-* = $1000
-Map:
-.import binary "assets/lolo/map.bin"
-Colors:
-.import binary "assets/lolo/colors.bin"
 
-.import source "apples.asm"
-
-Apples:
-    .byte 00
-
-WaitingApples:
-    .byte 00, 00, $11, 00, $11, $00, $00, $00, $0c, $00, $00, $0d, $12, $00, $00, $1c, $00, $00, $00, $12, $00, $10, $00, $ff, $0d, $11, 00, $10, $ff, 00, $11, 00, 00, 00, 00, 00, 00, $1a, 00, 00, 00, 00, $11, 00, 00, $0c, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, $ff
 * = $f000 "Charset"
-.import binary "assets/lolo/chars.bin"
+.import binary "assets/chars.bin"
 
 * = $e000
 .import binary "assets/sprites.bin"

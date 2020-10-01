@@ -193,6 +193,56 @@ APPLES: {
         adc #$00
         sta end + 1
         rts
+    
+    remove:
+        sta temp + 1
+        stx temp + 2
+
+        jsr clear
+
+        ldy #00
+    !Loop:
+        lda (start), y
+        cmp temp + 1
+        bne !++
+        iny
+        lda (start),y
+        cmp temp + 2
+        bne !+
+        jsr shift_left
         
-    list: .fill 255, $00
+        rts
+    !:  dey 
+    !:
+        iny
+        iny
+        cpy len
+        bne !Loop-
+        rts
+    
+    shift_left:
+    !Loop:
+        cpy #$01
+        beq !+
+        dey
+        dey
+        lda (start),y
+        iny
+        iny
+        sta (start),y
+        dey
+        bne !Loop-
+    !:
+        dec len
+        dec len
+        clc
+        lda start
+        adc #$02
+        sta start
+        lda start + 1
+        adc #$00
+        sta start + 1
+        rts
+
+    list: .fill 100, $00
 }
