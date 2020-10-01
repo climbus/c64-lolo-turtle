@@ -28,6 +28,8 @@ BasicUpstart2(Start)
     appleslen:  .byte 00
     points:     .byte 00
     
+.import source "vic.asm"
+
 .import source "apples.asm"
 
 Map:
@@ -85,7 +87,7 @@ CheckCollisions:
     // ((playery - 50) / 8) * 40 +  ((playerx - 24) / 8)
     lda #$00
     sta playerScreenPosition
-    lda #$c0
+    lda #VIC.SCREEN_MSB
     sta playerScreenPosition + 1
 
     lda playerY
@@ -126,7 +128,7 @@ CheckCollisions:
     cmp #$4e
     bne !+
         lda playerScreenPosition + 1
-        sbc #$c0
+        sbc #VIC.SCREEN_MSB
         tax
         lda playerScreenPosition
         jsr APPLES.remove
@@ -149,9 +151,9 @@ ShowPoints:
     lda playerY
     sbc #15
     sta SPRITE_1_Y
-    lda $d015
+    lda VIC.ENABLE_SPRITE_REGISTER
     ora #%00000010
-    sta $d015
+    sta VIC.ENABLE_SPRITE_REGISTER
     lda #20
     sta points
     rts
@@ -164,9 +166,9 @@ HidePoints:
         stx points
         rts
 !:
-    lda $d015
+    lda VIC.ENABLE_SPRITE_REGISTER
     and #%11111101
-    sta $d015
+    sta VIC.ENABLE_SPRITE_REGISTER
     rts
     
 ReadJoy:
@@ -196,22 +198,22 @@ AnimateTurtle:
     dey
     bne !+
     ldy #04
-    ldx $c3f8
+    ldx VIC.SCREEN_RAM + $3f8
     inx
-    stx $c3f8
+    stx VIC.SCREEN_RAM + $3f8
     cpx #$83
     bne !+
     ldx #$80
-    stx $c3f8
+    stx VIC.SCREEN_RAM + $3f8
 !:  sty sframe
     rts
 
 ScrollScreen:
     // hardware scroll
-    lda $d011
+    lda VIC.SCROLL_REGISTER
     and #%11110000
     ora offset
-    sta $d011
+    sta VIC.SCROLL_REGISTER
 
     ldx offset
     cpx #$01
@@ -230,31 +232,12 @@ ScrollScreen:
     stx offset 
     rts
 
-SwitchBuffer:
-    lda bufferAddress + 1
-    cmp #$c0
-    bne !+
-    lda #%00001100                                                            
-    sta $d018
-  
-    lda #$c4
-    sta bufferAddress + 1
-    rts
-!:
-    lda #%00011100 
-    sta $d018
-    
-    lda #$c0
-    sta bufferAddress + 1
-    rts
-    
 WaitForFrame: 
     lda $d012
     sty temp
     cmp temp
     bne WaitForFrame
     rts
-
 
 Init:
     sei
@@ -264,9 +247,9 @@ Init:
     sta $d021
 
     // extended color mode
-    lda $d011
+    lda VIC.SCROLL_REGISTER
     ora #%01000000
-    sta $d011
+    sta VIC.SCROLL_REGISTER
 
     // set road background color
     lda #$0c
@@ -294,16 +277,16 @@ Init:
 
     // point sprites
     lda #$80
-    sta $c3f8
-    sta $c7f8
+    sta VIC.SCREEN_RAM + $3f8
+    sta VIC.SCREEN_RAM + $7f8
 
     lda #$88
-    sta $c3f9
-    sta $c7f9
+    sta VIC.SCREEN_RAM + $3f9
+    sta VIC.SCREEN_RAM + $7f9
 
     // enable sprites
     lda #%11111101
-    sta $d015
+    sta VIC.ENABLE_SPRITE_REGISTER
 
     // sprite #1 colors
     lda #BROWN
@@ -345,7 +328,7 @@ DrawScreen:
 !ColLoop:
 TILE:
     lda Map
-    sta $c000
+    sta VIC.SCREEN_RAM
 
 COLOR:
     lda Colors
@@ -401,8 +384,6 @@ COLOR:
 
     ldx #$00
 !:
-    lda Map, x
-    sta $c400,x
     inx
     cpx #$28
     bne !-

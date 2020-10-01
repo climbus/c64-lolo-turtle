@@ -1,3 +1,4 @@
+.import source "vic.asm"
 
 APPLES: {
     .label start = $20
@@ -68,7 +69,7 @@ APPLES: {
         iny
         lda (start),y
         clc
-        adc #$c0
+        adc #VIC.SCREEN_MSB
         sta current + 1
         lda #$0e
         ora #%01000000
@@ -117,7 +118,7 @@ APPLES: {
         iny
         lda (start),y
         clc
-        adc #$c0
+        adc #VIC.SCREEN_MSB
         sta current + 1
         lda #$03
         sta (current,x)
@@ -155,7 +156,7 @@ APPLES: {
         bne !+
         dey
         lda (start),y
-        cmp #$c0
+        cmp #VIC.SCREEN_MSB
         bcc !+
             jsr clear
             jsr pop
