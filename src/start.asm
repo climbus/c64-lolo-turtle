@@ -60,6 +60,7 @@ MainLoop:
     jsr APPLES.draw
     jsr AnimateTurtle
     jsr HidePoints
+  
 
     ldy #$ff
     jsr WaitForFrame
@@ -248,14 +249,14 @@ Init:
 
     // extended color mode
     lda VIC.SCROLL_REGISTER
-    ora #%01000000
+    ora #%01001000
     sta VIC.SCROLL_REGISTER
 
     // set road background color
     lda #$0c
     sta $d022
 
-    //interupts
+    // //interupts
     lda #$7f
     sta $dc0d
     sta $dd0d
@@ -266,9 +267,9 @@ Init:
     ora #%11111101
     sta $01
     
-    // enable vic bank 3
+    // enable vic bank 1
     lda $dd00
-    and #%111111100
+    and #%11111110
     sta $dd00
 
     // setup character memory and screen memory
@@ -314,6 +315,7 @@ Init:
     sta SPRITE_1_Y
 
     jsr APPLES.init
+    cli
     rts
 
 DrawScreen:    
@@ -389,8 +391,8 @@ COLOR:
     bne !-
     rts
 
-* = $f000 "Charset"
+* = $7000 "Charset"
 .import binary "assets/chars.bin"
 
-* = $e000
+* = $6000
 .import binary "assets/sprites.bin"
