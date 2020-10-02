@@ -1,3 +1,4 @@
+.importonce
 .import source "vic.asm"
 
 APPLES: {
@@ -6,7 +7,9 @@ APPLES: {
     .label current = $24
     .label len = $26
     .label temp = $27
-
+    
+    counter:    .byte 00
+    
     // jsr init
     // lda #$0a
     // ldx #$00
@@ -245,5 +248,25 @@ APPLES: {
         sta start + 1
         rts
 
+    GrabNew: {
+        // check if new apple available
+        ldy counter
+        lda WaitingApples,y
+        cmp #$ff
+        bne !+
+        ldy #$ff
+        sty counter
+        jsr APPLES.shift
+        rts
+    !:
+        cmp #$00
+        beq !+
+            jsr APPLES.add
+    !:
+        rts
+    }
+
+    WaitingApples:
+        .byte 00, 00, 00, $11, 00, $00, $00, $00, $0c, $00, $00, $00, $00, $00, $0c, $0d, $12, $00, $00, $1c, $00, $00, $00, $12, $00, $10, $00, $ff
     list: .fill 100, $00
 }
