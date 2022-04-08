@@ -1,12 +1,9 @@
 BasicUpstart2(Start)
 
-.import source "vic.asm"
-
-.import source "player.asm"
-
-.import source "apples.asm"
-
-.import source "game.asm"
+#import "vic.asm"
+#import "player.asm"
+#import "apples.asm"
+#import "game.asm"
 
 Start:
     jsr GAME.Init

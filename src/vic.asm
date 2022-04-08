@@ -1,6 +1,12 @@
-.importonce
+#importonce
 
 VIC: {
+    .label FOREGROUND_COLOR = $d020
+    .label BACKGROUND_COLOR = $d021
+    .label EXTRA_BACKGROUND_COLOR = $d022
+
+    .label COLOR_RAM = $d800
+
     .label SCREEN_RAM = $4000
     .label SCREEN_MSB = $40
 

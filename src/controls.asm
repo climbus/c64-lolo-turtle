@@ -1,4 +1,4 @@
-.import source "player.asm"
+#import "player.asm"
 
 
 CONTROLS: {

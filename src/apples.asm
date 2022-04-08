@@ -1,5 +1,5 @@
-.importonce
-.import source "vic.asm"
+#importonce
+#import "vic.asm"
 
 APPLES: {
     .label start = $20
@@ -9,14 +9,6 @@ APPLES: {
     .label temp = $27
     
     counter:    .byte 00
-    
-    // jsr init
-    // lda #$0a
-    // ldx #$00
-    // jsr add
-    // lda #$0b
-    // ldx #$00
-    // jsr add
     rts
 
     init:
@@ -202,7 +194,7 @@ APPLES: {
         sta temp + 1
         stx temp + 2
 
-        jsr clear
+        // jsr clear
 
         ldy #00
     !Loop:
@@ -268,5 +260,6 @@ APPLES: {
 
     WaitingApples:
         .byte 00, 00, 00, $11, 00, $00, $00, $00, $0c, $00, $00, $00, $00, $00, $0c, $0d, $12, $00, $00, $1c, $00, $00, $00, $12, $00, $10, $00, $ff
+        
     list: .fill 100, $00
 }

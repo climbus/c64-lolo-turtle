@@ -1,5 +1,5 @@
-.importonce
-.import source "vic.asm"
+#importonce
+#import "vic.asm"
 
 PLAYER: {
     .label playerScreenPosition = $15
@@ -69,7 +69,7 @@ PLAYER: {
     }
 
 
-AnimateTurtle: {
+    AnimateTurtle: {
         ldy sframe
         dey
         bne !+

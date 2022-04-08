@@ -1,22 +1,34 @@
-.import source "vic.asm"
-.import source "player.asm"
-.import source "apples.asm"
-.import source "controls.asm"
+#import "vic.asm"
+#import "player.asm"
+#import "apples.asm"
+#import "controls.asm"
 
 
 GAME: {
     .label col=$11
     .label row=$12
     .label temp = $13
-    points: .byte 00
+
+    .label ROAD_COLOR = $0c
+
+    show_points_counter: .byte 00
     offset:	.byte 00
+    points: .byte 00, 00, 00
+    game_counter: .byte 00, 00
+
+    ScreenRowLSB:
+		.fill 40, <[VIC.SCREEN_RAM + i * $28]
+	ScreenRowMSB:
+		.fill 40, >[VIC.SCREEN_RAM + i * $28]
+
+
 
     Init: {
         sei
         // change foreground and background colors
         lda #$00
-        sta $d020
-        sta $d021
+        sta VIC.FOREGROUND_COLOR
+        sta VIC.BACKGROUND_COLOR
 
         // extended color mode
         lda VIC.SCROLL_REGISTER
@@ -24,8 +36,8 @@ GAME: {
         sta VIC.SCROLL_REGISTER
 
         // set road background color
-        lda #$0c
-        sta $d022
+        lda #ROAD_COLOR
+        sta VIC.EXTRA_BACKGROUND_COLOR
 
         // //interupts
         lda #$7f
@@ -68,7 +80,7 @@ GAME: {
 
     COLOR:
         lda Colors
-        sta $d800
+        sta VIC.COLOR_RAM
 
         clc
         lda TILE + 1
@@ -126,65 +138,118 @@ GAME: {
         rts
     }
 
-    CheckCollisions: {
-        // ((playery - 50) / 8) * 40 +  ((playerx - 24) / 8)
-        lda #$00
-        sta PLAYER.playerScreenPosition
-        lda #VIC.SCREEN_MSB
-        sta PLAYER.playerScreenPosition + 1
-
+    GetCharPosition: {
+        
         lda PLAYER.playerY
+        sec
         sbc #50
         lsr
         lsr
         lsr
-        sta temp
-
-        ldx #40
-    !:
-        lda PLAYER.playerScreenPosition
-        adc temp
-        sta PLAYER.playerScreenPosition
-        lda PLAYER.playerScreenPosition + 1
-        adc #00
-        sta PLAYER.playerScreenPosition + 1
-        dex
-        bne !-
-
+        tay
+        
         lda PLAYER.playerX
-        sbc #24
+        sec
+        sbc #11
         lsr
         lsr
         lsr
-        sta temp
+        tax
 
-        lda PLAYER.playerScreenPosition
-        adc temp
-        sta PLAYER.playerScreenPosition
-        lda PLAYER.playerScreenPosition + 1
-        adc #00
-        sta PLAYER.playerScreenPosition + 1
+        // x - row number
+        // y - col number
+        rts
+    }
 
-        ldx #00
-        lda (PLAYER.playerScreenPosition, x)
+    CheckCollisions: {
+        // calculate row and col of player position
+        .label ROW = temp
+        .label COL = temp + 1
+
+        jsr GetCharPosition
+        
+        stx ROW
+        sty COL
+
+        jsr GetCharacterAt
+
+    
+        // // debug ////
+        // lda #00
+        // sta (PLAYER.playerScreenPosition),y
+        // iny
+        // sta (PLAYER.playerScreenPosition),y
+        // ////////////
 
         cmp #$4e
         bne !+
+            ldx ROW
+            ldy COL
+            lda #$03
+            jsr SetCharacterAt
+
             lda PLAYER.playerScreenPosition + 1
             sbc #VIC.SCREEN_MSB
             tax
             lda PLAYER.playerScreenPosition
             jsr APPLES.remove
             jsr ShowPoints
+            jsr AddPoints
             rts
     !:
-        cmp #$03
-        beq !+
-        lda PLAYER.platerLastPosition
-        sta PLAYER.playerX
-        sta VIC.SPRITE_0_X
+        
+    //     cmp #$03
+    //     beq !+
+    //     lda PLAYER.platerLastPosition
+    //     sta PLAYER.playerX
+    //     sta VIC.SPRITE_0_X
+    //     rts
+    // !:
         rts
-    !:
+    }
+
+    GetCharacterAt: {
+.break
+        // x - row position
+        // y - col position
+        lda ScreenRowLSB,y
+        sta PLAYER.playerScreenPosition
+        lda ScreenRowMSB,y
+        sta PLAYER.playerScreenPosition+1
+
+        txa
+        tay
+        lda (PLAYER.playerScreenPosition),y
+        // a - character
+        rts
+    }
+
+    SetCharacterAt: {
+        sta temp
+        lda ScreenRowLSB,y
+        sta PLAYER.playerScreenPosition
+        lda ScreenRowMSB,y
+        sta PLAYER.playerScreenPosition+1
+
+        txa
+        tay
+
+        lda temp
+        sta (PLAYER.playerScreenPosition),y
+        rts
+    }
+
+    AddPoints: {
+        clc
+        lda points
+        adc #100
+        sta points
+        lda points + 1
+        adc #00
+        sta points + 1
+        lda points + 2
+        adc #00
+        sta points + 2
         rts
     }
 
@@ -197,14 +262,28 @@ GAME: {
         jsr APPLES.draw
         jsr PLAYER.AnimateTurtle
         jsr HidePoints
+        jsr UpdateCounter
     
 
         ldy #$ff
         jsr VIC.WaitForFrame
-        jmp MainLoop
+        lda game_counter
+        cmp #$05
+        bne MainLoop
         rts
     }
 
+    UpdateCounter: {
+        clc
+        lda game_counter + 1
+        adc #$01
+        sta game_counter + 1
+
+        lda game_counter
+        adc #00
+        sta game_counter
+        rts
+    }
     ShowPoints: {
         lda PLAYER.playerX
         adc #20
@@ -216,16 +295,16 @@ GAME: {
         ora #%00000010
         sta VIC.ENABLE_SPRITE_REGISTER
         lda #20
-        sta points
+        sta show_points_counter
         rts
     }
 
     HidePoints: {
-        ldx points
+        ldx show_points_counter
         cpx #$00
         beq !+
             dex
-            stx points
+            stx show_points_counter
             rts
     !:
         lda VIC.ENABLE_SPRITE_REGISTER
