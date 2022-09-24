@@ -1,0 +1,116 @@
+.label Start=$7308
+.label ColorTable=$147a
+.label CharsEnd=$7308
+.label CONTROLS=$a6e {
+  .label ReadJoy=$a6e {
+  }
+  .label JOY_RT=$8
+  .label JOY_PORT_2=$dc00
+  .label JOY_LT=$4
+}
+.label APPLES=$893 {
+  .label add=$8a6
+  .label init=$895
+  .label temp=$27
+  .label move=$91a
+  .label shift_left=$9b2
+  .label shift=$968
+  .label start=$20
+  .label clear=$8fe
+  .label counter=$893
+  .label draw=$8d4
+  .label list=$a0a
+  .label remove=$993
+  .label WaitingApples=$9ee
+  .label pop=$8c2
+  .label current=$24
+  .label GrabNew=$9d3 {
+  }
+  .label len=$26
+  .label end=$22
+  .label check_last=$951
+}
+.label MapEnd=$132d
+.label LinesTable=$144a
+.label PLAYER=$818 {
+  .label platerLastPosition=$17
+  .label Init=$81b {
+  }
+  .label playerX=$819
+  .label sframe=$818
+  .label MoveLeft=$859 {
+  }
+  .label AnimateTurtle=$877 {
+  }
+  .label playerY=$81a
+  .label MoveRight=$868 {
+  }
+  .label playerScreenPosition=$15
+}
+.label VIC=$80e {
+  .label temp=$13
+  .label SCROLL_REGISTER=$d011
+  .label SPRITE_0_X=$d000
+  .label EXTRA_BACKGROUND_COLOR2=$d023
+  .label BACKGROUND_COLOR=$d021
+  .label SCREEN_MSB=$40
+  .label ENABLE_SPRITE_REGISTER=$d015
+  .label FOREGROUND_COLOR=$d020
+  .label SCREEN_RAM=$4000
+  .label SPRITE_0_Y=$d001
+  .label SPRITE_1_X=$d002
+  .label SPRITE_1_Y=$d003
+  .label COLOR_RAM=$d800
+  .label EXTRA_BACKGROUND_COLOR=$d022
+  .label WaitForFrame=$80e {
+  }
+}
+.label GAME=$a8a {
+  .label TileScreenLocations2x2=$a8a
+  .label ScrollOffset=$6
+  .label MainLoop=$c61 {
+  }
+  .label ROAD_COLOR=$c
+  .label points=$a90
+  .label Init=$ae5 {
+  }
+  .label AddPoints=$c47 {
+  }
+  .label Counter=$7
+  .label UpdateCounter=$c88 {
+  }
+  .label Col=$4
+  .label temp=$8
+  .label game_counter=$a93
+  .label offset=$a8f
+  .label SetCharacterAt=$c34 {
+  }
+  .label ScreenRowMSB=$abd
+  .label DrawScreen=$b2f {
+    .label Scr=$b83
+    .label TileLookup=$b7d
+    .label Color=$b8d
+    .label Tile=$b5a
+  }
+  .label ScrollScreen=$ccd {
+  }
+  .label GetCharPosition=$be7 {
+  }
+  .label ScreenRowLSB=$a95
+  .label CheckCollisions=$bfc {
+    .label COL=$9
+    .label ROW=$8
+  }
+  .label GetCharacterAt=$c25 {
+  }
+  .label HidePoints=$cb8 {
+  }
+  .label ShowPoints=$c9a {
+  }
+  .label show_points_counter=$a8e
+  .label Row=$5
+}
+.label Colors=$13e9
+.label Tiles=$132d
+.label Map=$ced
+.label Chars=$7000

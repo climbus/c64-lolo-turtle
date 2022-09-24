@@ -1,2 +1,2 @@
 main:
-	kickass -o dist/lolo.prg src/start.asm
+	java -jar /mnt/c/opt/KickAssembler/KickAss.jar -o dist/lolo.prg src/start.asm

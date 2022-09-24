@@ -1,0 +1,104 @@
+.label PLAYER=$818 {
+  .label platerLastPosition=$17
+  .label Init=$81b {
+  }
+  .label playerX=$819
+  .label sframe=$818
+  .label MoveLeft=$859 {
+  }
+  .label AnimateTurtle=$877 {
+  }
+  .label playerY=$81a
+  .label MoveRight=$868 {
+  }
+  .label playerScreenPosition=$15
+}
+.label VIC=$80e {
+  .label temp=$13
+  .label SCROLL_REGISTER=$d011
+  .label SPRITE_0_X=$d000
+  .label BACKGROUND_COLOR=$d021
+  .label SCREEN_MSB=$40
+  .label ENABLE_SPRITE_REGISTER=$d015
+  .label FOREGROUND_COLOR=$d020
+  .label SCREEN_RAM=$4000
+  .label SPRITE_0_Y=$d001
+  .label SPRITE_1_X=$d002
+  .label SPRITE_1_Y=$d003
+  .label COLOR_RAM=$d800
+  .label EXTRA_BACKGROUND_COLOR=$d022
+  .label WaitForFrame=$80e {
+  }
+}
+.label GAME=$a8a {
+  .label col=$11
+  .label temp=$13
+  .label game_counter=$a8f
+  .label offset=$a8b
+  .label SetCharacterAt=$bdb {
+  }
+  .label MainLoop=$c08 {
+  }
+  .label ScreenRowMSB=$ab9
+  .label DrawScreen=$b1c {
+    .label COLOR=$b2c
+    .label TILE=$b26
+  }
+  .label ScrollScreen=$c74 {
+  }
+  .label ROAD_COLOR=$c
+  .label GetCharPosition=$b8e {
+  }
+  .label points=$a8c
+  .label ScreenRowLSB=$a91
+  .label CheckCollisions=$ba3 {
+    .label COL=$14
+    .label ROW=$13
+  }
+  .label GetCharacterAt=$bcc {
+  }
+  .label HidePoints=$c5f {
+  }
+  .label Init=$ae1 {
+  }
+  .label AddPoints=$bee {
+  }
+  .label Colors=$12d4
+  .label ShowPoints=$c41 {
+  }
+  .label show_points_counter=$a8a
+  .label row=$12
+  .label Map=$c94
+  .label UpdateCounter=$c2f {
+  }
+}
+.label Start=$1914
+.label CONTROLS=$a6e {
+  .label ReadJoy=$a6e {
+  }
+  .label JOY_RT=$8
+  .label JOY_PORT_2=$dc00
+  .label JOY_LT=$4
+}
+.label APPLES=$893 {
+  .label add=$8a6
+  .label init=$895
+  .label temp=$27
+  .label move=$91a
+  .label shift_left=$9b2
+  .label shift=$968
+  .label start=$20
+  .label clear=$8fe
+  .label counter=$893
+  .label draw=$8d4
+  .label list=$a0a
+  .label remove=$993
+  .label WaitingApples=$9ee
+  .label pop=$8c2
+  .label current=$24
+  .label GrabNew=$9d3 {
+  }
+  .label len=$26
+  .label end=$22
+  .label check_last=$951
+}

@@ -10,9 +10,6 @@ Start:
     jsr GAME.DrawScreen
     jsr GAME.MainLoop
     rts
-    
-* = $7000 "Charset"
-.import binary "assets/chars.bin"
 
 * = $6000
 .import binary "assets/sprites.bin"

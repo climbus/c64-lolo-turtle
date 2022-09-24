@@ -4,6 +4,7 @@ VIC: {
     .label FOREGROUND_COLOR = $d020
     .label BACKGROUND_COLOR = $d021
     .label EXTRA_BACKGROUND_COLOR = $d022
+    .label EXTRA_BACKGROUND_COLOR2 = $d023
 
     .label COLOR_RAM = $d800
 

@@ -5,9 +5,14 @@
 
 
 GAME: {
-    .label col=$11
-    .label row=$12
-    .label temp = $13
+    .label Col = $04
+    .label Row = $05
+    .label ScrollOffset = $06
+    .label Counter = $07
+    .label temp = $8
+
+    TileScreenLocations2x2: 
+        .byte 0,1,40,41
 
     .label ROAD_COLOR = $0c
 
@@ -18,7 +23,7 @@ GAME: {
 
     ScreenRowLSB:
 		.fill 40, <[VIC.SCREEN_RAM + i * $28]
-	ScreenRowMSB:
+    ScreenRowMSB:
 		.fill 40, >[VIC.SCREEN_RAM + i * $28]
 
 
@@ -28,16 +33,23 @@ GAME: {
         // change foreground and background colors
         lda #$00
         sta VIC.FOREGROUND_COLOR
+        lda #$08
         sta VIC.BACKGROUND_COLOR
 
-        // extended color mode
-        lda VIC.SCROLL_REGISTER
-        ora #%01001000
-        sta VIC.SCROLL_REGISTER
+        lda $d011
+        and #%10111111
+        sta $d011
+        // multicolor color mode
+        lda $d016
+        ora #%00010000
+        sta $d016
 
         // set road background color
-        lda #ROAD_COLOR
+        lda #$0b
         sta VIC.EXTRA_BACKGROUND_COLOR
+        lda #$07
+        sta VIC.EXTRA_BACKGROUND_COLOR2
+
 
         // //interupts
         lda #$7f
@@ -65,77 +77,104 @@ GAME: {
     }
 
     DrawScreen: {   
-        lda #$00
-        sta row
-        sta col
 
+        lda #<VIC.SCREEN_RAM + $03e7 - 40 - 1
+        sta Scr + 1
+        sta Color + 1
+
+        lda #>VIC.SCREEN_RAM + $03e7 -40 - 1
+        sta Scr + 2
+        lda #>VIC.COLOR_RAM + $03e7 - 40 - 1
+        sta Color + 2
+
+        lda #<MapEnd - 1
+        sta Tile + 1
+        lda #>MapEnd - 1
+        sta Tile + 2
+        
+        lda #$00
+        sta Row
     !RowLoop:
         lda #$00
-        sta col
-
+        sta Col
     !ColLoop:
-    TILE:
-        lda Map
-        sta VIC.SCREEN_RAM
+        ldy #$00
 
-    COLOR:
-        lda Colors
-        sta VIC.COLOR_RAM
+        lda #$00
+        sta TileLookup + 2
 
+    Tile:
+        lda $BEEF	
+        sta TileLookup + 1		
+        asl TileLookup + 1
+        rol TileLookup + 2
+        asl TileLookup + 1
+        rol TileLookup + 2
+
+        //Add the MAP_TILES address
         clc
-        lda TILE + 1
-        adc #$01
-        sta TILE + 1
+        lda #<Tiles
+        adc TileLookup + 1
+        sta TileLookup + 1
+        lda #>Tiles
+        adc TileLookup + 2
+        sta TileLookup + 2
 
-        lda TILE + 2
-        adc #$00
-        sta TILE + 2
+    TileLookup:
+            lda $beef,y
+        ldx TileScreenLocations2x2,y
+    Scr:
+        sta $beef,x
+        tax
+        lda Colors,x
+        ldx TileScreenLocations2x2, y 
+    Color:
+        sta $BEEF, x //Self modified color ram
 
-        clc
-        lda TILE + 4
-        adc #$01
-        sta TILE + 4
+        iny
+        cpy #$04
+        bne TileLookup
 
-        lda TILE + 5
-        adc #$00
-        sta TILE + 5
+        sec 
+        lda Tile + 1
+        sbc #$01
+        sta Tile + 1
+        lda Tile + 2
+        sbc #$00
+        sta Tile + 2
 
-        clc
-        lda COLOR + 1
-        adc #$01
-        sta COLOR + 1
+        sec
+        lda Scr + 1
+        sbc #$02
+        sta Scr + 1
+        sta Color + 1
+        bcs !+
+        dec Scr + 2
+        dec Color + 2
+  !:
 
-        lda COLOR + 2
-        adc #$00
-        sta COLOR + 2
-
-        clc
-        lda COLOR + 4
-        adc #$01
-        sta COLOR + 4
-
-        lda COLOR + 5
-        adc #$00
-        sta COLOR + 5
-
-        inc col
-
-        ldx col
-        cpx #40
-        bne !ColLoop-
-            
-        inc row
-
-        ldx row
-        cpx #25
-        bne !RowLoop-
-
-        ldx #$00
-    !:
-        inx
-        cpx #$28
-        bne !-
-        rts
+        inc Col
+        ldx Col
+        cpx #20
+        beq !+
+        jmp !ColLoop-
+  !:
+        sec
+        lda Scr + 1
+        lda Color + 1
+        sbc #$28
+        sta Scr + 1
+        sta Color + 1
+        bcs !+
+        dec Scr + 2
+        dec Color + 2
+  !:
+        inc Row
+        ldx Row
+        cpx #13
+        beq !+
+        jmp !RowLoop-
+!:
     }
 
     GetCharPosition: {
@@ -209,7 +248,6 @@ GAME: {
     }
 
     GetCharacterAt: {
-.break
         // x - row position
         // y - col position
         lda ScreenRowLSB,y
@@ -322,23 +360,36 @@ GAME: {
         ldx offset
         cpx #$01
         bne !+
-        jsr APPLES.check_last
-        jsr APPLES.move
-        jsr APPLES.GrabNew
+        //jsr APPLES.check_last
+        //jsr APPLES.move
+        //jsr APPLES.GrabNew
     !:  
         ldx offset
         cpx #$07
         bne !+
         ldx #00
-        inc APPLES.counter
+        //inc APPLES.counter
     !:
         inx
         stx offset 
         rts
     }
-    Map:
-    .import binary "assets/map.bin"
-
-    Colors:
-    .import binary "assets/colors.bin"
 }
+
+Map:
+	.import binary "./assets/map.bin"
+MapEnd:
+
+Tiles:
+	.import binary "./assets/tiles.bin"
+
+Colors:
+	.import binary "./assets/colors.bin"
+
+LinesTable: .fillword 24, VIC.SCREEN_RAM + 40 * (24-i)
+ColorTable: .fillword 24, VIC.COLOR_RAM + 40 * (24-i)
+
+* = $7000 "Charset"
+Chars:
+	.import binary "./assets/chars.bin"
+CharsEnd:
