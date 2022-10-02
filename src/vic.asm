@@ -9,10 +9,12 @@ VIC: {
     .label COLOR_RAM = $d800
 
     .label SCREEN_RAM = $4000
+    .label SCREEN_RAM2 = $4400
     .label SCREEN_MSB = $40
 
     .label ENABLE_SPRITE_REGISTER = $d015
     .label SCROLL_REGISTER = $d011
+    .label MEMORY_SETUP_REGISTER = $d018
 
     .label SPRITE_0_X = $d000
     .label SPRITE_0_Y = $d001

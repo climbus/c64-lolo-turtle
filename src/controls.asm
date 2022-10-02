@@ -11,7 +11,6 @@ CONTROLS: {
         lda JOY_PORT_2
         and #JOY_LT
         bne !+
-	inc $d021
         jsr PLAYER.MoveLeft
         rts
     !:    
@@ -19,7 +18,6 @@ CONTROLS: {
         lda JOY_PORT_2
         and #JOY_RT
         bne !+
-	dec $d021
         jsr PLAYER.MoveRight
     !:
         rts

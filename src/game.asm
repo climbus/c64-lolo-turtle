@@ -2,6 +2,7 @@
 #import "player.asm"
 #import "apples.asm"
 #import "controls.asm"
+#import "irq.asm"
 
 
 GAME: {
@@ -14,19 +15,24 @@ GAME: {
     TileScreenLocations2x2: 
         .byte 0,1,40,41
 
+    TileScreenLocations2x2OneLine: 
+        .byte 0,1,0,1
+
     .label ROAD_COLOR = $0c
 
     show_points_counter: .byte 00
     offset:	.byte 00
     points: .byte 00, 00, 00
     game_counter: .byte 00, 00
+    rows_count: .byte $0b
 
     ScreenRowLSB:
 		.fill 40, <[VIC.SCREEN_RAM + i * $28]
     ScreenRowMSB:
 		.fill 40, >[VIC.SCREEN_RAM + i * $28]
 
-
+    tmp_tile: .byte 00, 00 
+    current_tile_row: .byte 2
 
     Init: {
         sei
@@ -37,7 +43,7 @@ GAME: {
         sta VIC.BACKGROUND_COLOR
 
         lda $d011
-        and #%10111111
+        and #%10110111
         sta $d011
         // multicolor color mode
         lda $d016
@@ -76,21 +82,119 @@ GAME: {
         rts
     }
 
-    DrawScreen: {   
+    DrawNextRow: {   
+        set16(Screen.screen_base, Scr + 1)
+        lda #<VIC.COLOR_RAM
+        sta Color + 1
+        lda #>VIC.COLOR_RAM
+        sta Color + 2
+        add16im(Scr + 1, 38, Scr +1)
+        add16im(Color + 1, 38, Color + 1)
 
-        lda #<VIC.SCREEN_RAM + $03e7 - 40 - 1
+        lda current_tile_row
+        cmp #$00
+        bne !+
+        set16(tmp_tile, Tile +1)    
+    !:
+        lda current_tile_row
+        cmp #02
+        bne !+
+        set16(Tile + 1, tmp_tile)
+    !:
+        lda #$00
+        sta Col
+    !ColLoop:
+        ldy current_tile_row
+
+        lda #$00
+        sta TileLookup + 2
+
+    Tile:
+        lda $BEEF	
+        sta TileLookup + 1		
+        asl TileLookup + 1
+        rol TileLookup + 2
+        asl TileLookup + 1
+        rol TileLookup + 2
+
+        //Add the MAP_TILES address
+        clc
+        lda #<Tiles
+        adc TileLookup + 1
+        sta TileLookup + 1
+        lda #>Tiles
+        adc TileLookup + 2
+        sta TileLookup + 2
+
+    TileLookup:
+        lda $beef,y
+        ldx TileScreenLocations2x2OneLine,y
+    Scr:
+        sta $beef,x
+        tax
+        lda Colors,x
+        ldx TileScreenLocations2x2OneLine,y 
+    Color:
+        sta $BEEF, x //Self modified color ram
+        iny
+        cpy #$02
+        beq !+
+        cpy #$04
+        beq !+
+        jmp TileLookup
+!:
+        sec 
+        lda Tile + 1
+        sbc #$01
+        sta Tile + 1
+        lda Tile + 2
+        sbc #$00
+        sta Tile + 2
+        sec
+        lda Scr + 1
+        sbc #$02
         sta Scr + 1
         sta Color + 1
+        bcs !+
+        dec Scr + 2
+        dec Color + 2
+  !:
 
-        lda #>VIC.SCREEN_RAM + $03e7 -40 - 1
-        sta Scr + 2
-        lda #>VIC.COLOR_RAM + $03e7 - 40 - 1
-        sta Color + 2
+        inc Col
+        ldx Col
+        cpx #20
+        beq !+
+        jmp !ColLoop-
+  !:
+
+        lda current_tile_row
+        eor #2
+        sta current_tile_row
+        rts
+    }
+
+    // screen draw start
+    // color draw start
+    // num rows
+    // map position
+    DrawScreen: {   
+
+        lda #<VIC.SCREEN_RAM + $03e7 - [40 * 6] - 1
+        sta DrawRows.Scr + 1
+        sta DrawRows.Color + 1
+
+        lda #>VIC.SCREEN_RAM + $03e7 - [40 * 6] - 1
+        sta DrawRows.Scr + 2
+        lda #>VIC.COLOR_RAM + $03e7 - [40 * 6] - 1
+        sta DrawRows.Color + 2
 
         lda #<MapEnd - 1
-        sta Tile + 1
+        sta DrawRows.Tile + 1
         lda #>MapEnd - 1
-        sta Tile + 2
+        sta DrawRows.Tile + 2
+    }
+
+    DrawRows: { 
         
         lda #$00
         sta Row
@@ -121,7 +225,7 @@ GAME: {
         sta TileLookup + 2
 
     TileLookup:
-            lda $beef,y
+        lda $beef,y
         ldx TileScreenLocations2x2,y
     Scr:
         sta $beef,x
@@ -171,10 +275,15 @@ GAME: {
   !:
         inc Row
         ldx Row
-        cpx #13
+        cpx rows_count
         beq !+
         jmp !RowLoop-
 !:
+        lda Tile + 1
+        sta DrawNextRow.Tile + 1
+        lda Tile + 2
+        sta DrawNextRow.Tile + 2
+        rts
     }
 
     GetCharPosition: {
@@ -296,15 +405,15 @@ GAME: {
         jsr VIC.WaitForFrame
         jsr CONTROLS.ReadJoy
         jsr CheckCollisions
-        jsr ScrollScreen
+        //jsr ScrollScreen
         jsr APPLES.draw
         jsr PLAYER.AnimateTurtle
         jsr HidePoints
         jsr UpdateCounter
     
 
-        ldy #$ff
-        jsr VIC.WaitForFrame
+        //ldy #$ff
+        //jsr VIC.WaitForFrame
         lda game_counter
         cmp #$05
         bne MainLoop

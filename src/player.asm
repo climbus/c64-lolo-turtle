@@ -7,7 +7,7 @@ PLAYER: {
     
     sframe:     .byte 04
     playerX:    .byte $aa
-    playerY:    .byte $d0
+    playerY:    .byte $b0
     
     Init: {
     // point sprites
