@@ -17,6 +17,7 @@ Screen: {
         
     .const ROWS_COLOR_UPPER = 8
     .const ROWS_COLOR_LOWER = 11
+    .const ROWS_CHARS_PER_FRAME = 10
 
     Init: {
         set16im(VIC.SCREEN_RAM, screen_base)
@@ -30,59 +31,48 @@ Screen: {
     }
 
     ShiftBottom: {
-//        lda change_scroll
-//        bne !+
-            inc vscroll
-//    !:
-//        eor #1
-//        sta change_scroll
+        inc vscroll
 
         lda vscroll
-        cmp #$08
+        cmp #$08   // Shift screen frame
         bne !+
-        .break
         jsr ColorShiftLower
+
         lda #$08
         sta VIC.BACKGROUND_COLOR
         
-        .break
         jmp SwapScreens
     after_swap:
+
+        // Reset scroll register
         lda #$00
         sta vscroll
         UpdateScrollRegister(vscroll)
+
         jsr GAME.DrawNextRow
-        .break
         rts
     !:
         cmp #$04
         bne !+
         jsr CharsShiftUpper
     !:
-        lda vscroll
         cmp #$06
         bne !+
         jsr CharsShiftLower
     !:
-        
         lda #$08
         sta VIC.BACKGROUND_COLOR
-        
+
         UpdateScrollRegister(vscroll)
         rts
     }
 
     ColorShiftUpper: {
-   //     lda change_scroll
-   //     bne !+
-   //     rts
-   // !:
         set16im($d800 + 40 * ROWS_COLOR_UPPER, screen_ptr)
         set16im(tmp_row, screen_ptr_dest)
         ldy #0    
         ldx #1  
         jsr video_ram_copy_line
-
 
         set16im($d800 + 40 * [ROWS_COLOR_UPPER -1], screen_ptr)
         set16im($d800 + 40 * ROWS_COLOR_UPPER, screen_ptr_dest)
@@ -108,20 +98,20 @@ Screen: {
     CharsShiftUpper: {
         set16(screen_base, screen_ptr)
         set16(screen_back_buffer_base, screen_ptr_dest)
-        add16im(screen_ptr, 40*9, screen_ptr)
-        add16im(screen_ptr_dest, 40*10, screen_ptr_dest)
+        add16im(screen_ptr, 40 * [ROWS_CHARS_PER_FRAME - 1], screen_ptr)
+        add16im(screen_ptr_dest, 40 * ROWS_CHARS_PER_FRAME, screen_ptr_dest)
         ldy #0             
-        ldx #10 
+        ldx #ROWS_CHARS_PER_FRAME
         jmp video_ram_copy_line
     }
 
     CharsShiftLower: {
         set16(screen_base, screen_ptr)
         set16(screen_back_buffer_base, screen_ptr_dest)
-        add16im(screen_ptr, 40*18, screen_ptr)
-        add16im(screen_ptr_dest, 40*19, screen_ptr_dest)
+        add16im(screen_ptr, 40 * [ROWS_CHARS_PER_FRAME * 2 - 2], screen_ptr)
+        add16im(screen_ptr_dest, 40 * [ROWS_CHARS_PER_FRAME * 2 -1], screen_ptr_dest)
         ldy #0                
-        ldx #10 
+        ldx #ROWS_CHARS_PER_FRAME
         jmp video_ram_copy_line
     }
 
