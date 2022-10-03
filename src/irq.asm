@@ -7,8 +7,9 @@ yscroll:            .byte 0
 IRQ: {
     .label irq_delay_default = 0
     .label FIRST_VIS_LINE = 50
-    .label START_COPYING_UPPER_COLOR_RAM_LINE = 96
+    .label START_COPYING_UPPER_COLOR_RAM_LINE = 115
     .label BEGIN_VBLANK_LINE = 250
+    .label START_COPYING_LOWER_COLOR_RAM_LINE = 230
     .label SYSTEM_IRQ_HANDLER = $ea81
 
     Setup: {  
@@ -32,11 +33,10 @@ IRQ: {
         lda Screen.vscroll                                  
         cmp #7
         bne !+          
-        inc $d020
     upper:           
+        .break
         jsr Screen.ColorShiftUpper
         .break
-        dec $d020
     !:
         SetRasterInterrupt(216, IRQFooter)
         IRQEnd()
@@ -71,7 +71,8 @@ IRQ: {
         lda Screen.vscroll
         cmp #07
         bne !+
-        //jsr Screen.ColorShiftMiddle
+        SetRasterInterrupt(START_COPYING_LOWER_COLOR_RAM_LINE, IRQBeginVBlank)
+        IRQEnd()
     !:
         SetRasterInterrupt(BEGIN_VBLANK_LINE, IRQBeginVBlank)
         IRQEnd()
@@ -79,15 +80,10 @@ IRQ: {
     IRQBeginVBlank: {
         IRQStart()
 
-        lda #$08
-        sta VIC.BACKGROUND_COLOR
-        
         jsr Screen.ShiftBottom
         lda Screen.vscroll
         cmp #07
         bne !+
-        lda Screen.change_scroll
-        beq !+
         jmp HandlerMiddle
     !:
         jmp HandlerFooter

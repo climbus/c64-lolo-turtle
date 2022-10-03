@@ -15,9 +15,8 @@ Screen: {
     .label screen_ptr_dest = $0a
     .label color_ptr_dest = $0c
         
-    .const ROWS_COLOR_UPPER = 10
-    .const ROWS_COLOR_LOWER = 9
-    .const ROWS_COLOR_MIDDLE = 0
+    .const ROWS_COLOR_UPPER = 8
+    .const ROWS_COLOR_LOWER = 11
 
     Init: {
         set16im(VIC.SCREEN_RAM, screen_base)
@@ -31,29 +30,31 @@ Screen: {
     }
 
     ShiftBottom: {
-        lda change_scroll
-        bne !+
+//        lda change_scroll
+//        bne !+
             inc vscroll
-    !:
-        eor #1
-        sta change_scroll
+//    !:
+//        eor #1
+//        sta change_scroll
 
         lda vscroll
         cmp #$08
         bne !+
-        inc $d020
+        .break
         jsr ColorShiftLower
+        lda #$08
+        sta VIC.BACKGROUND_COLOR
+        
+        .break
+        jmp SwapScreens
+    after_swap:
         lda #$00
         sta vscroll
         UpdateScrollRegister(vscroll)
-        jmp SwapScreens
-    after_swap:
-        inc $d020
         jsr GAME.DrawNextRow
         .break
-        nop
+        rts
     !:
-        lda vscroll
         cmp #$04
         bne !+
         jsr CharsShiftUpper
@@ -63,15 +64,19 @@ Screen: {
         bne !+
         jsr CharsShiftLower
     !:
+        
+        lda #$08
+        sta VIC.BACKGROUND_COLOR
+        
         UpdateScrollRegister(vscroll)
         rts
     }
 
     ColorShiftUpper: {
-        lda change_scroll
-        bne !+
-        rts
-    !:
+   //     lda change_scroll
+   //     bne !+
+   //     rts
+   // !:
         set16im($d800 + 40 * ROWS_COLOR_UPPER, screen_ptr)
         set16im(tmp_row, screen_ptr_dest)
         ldy #0    
@@ -81,45 +86,25 @@ Screen: {
 
         set16im($d800 + 40 * [ROWS_COLOR_UPPER -1], screen_ptr)
         set16im($d800 + 40 * ROWS_COLOR_UPPER, screen_ptr_dest)
-        inc $d020
         ldy #0 
         ldx #ROWS_COLOR_UPPER
         jmp video_ram_copy_line
     }
 
     ColorShiftLower: {
-        set16im($d800 + 40 * [ROWS_COLOR_UPPER + ROWS_COLOR_LOWER + ROWS_COLOR_MIDDLE - 1], screen_ptr)
-        set16im($d800 + 40 * [ROWS_COLOR_UPPER + ROWS_COLOR_LOWER + ROWS_COLOR_MIDDLE], screen_ptr_dest)
+        set16im($d800 + 40 * [ROWS_COLOR_UPPER + ROWS_COLOR_LOWER - 1], screen_ptr)
+        set16im($d800 + 40 * [ROWS_COLOR_UPPER + ROWS_COLOR_LOWER], screen_ptr_dest)
         ldy #0    
         ldx #ROWS_COLOR_LOWER
         jsr video_ram_copy_line
 
         set16im(tmp_row, screen_ptr)
-        set16im($d800 + 40 * [ROWS_COLOR_MIDDLE + ROWS_COLOR_LOWER + 2], screen_ptr_dest)
+        set16im($d800 + 40 * [ROWS_COLOR_UPPER + 1], screen_ptr_dest)
         ldy #0               
         ldx #1    
         jmp video_ram_copy_line
     }
 
-    ColorShiftMiddle: {
-        set16im($d800 + 40 * [ROWS_COLOR_UPPER + ROWS_COLOR_MIDDLE], screen_ptr)
-        set16im(tmp_row, screen_ptr_dest)
-        ldy #0    
-        ldx #1  
-        jsr video_ram_copy_line
-
-        set16im($d800 + 40 * [ROWS_COLOR_UPPER + ROWS_COLOR_MIDDLE - 1], screen_ptr)
-        set16im($d800 + 40 * [ROWS_COLOR_UPPER + ROWS_COLOR_MIDDLE], screen_ptr_dest)
-        ldy #0    
-        ldx #ROWS_COLOR_MIDDLE
-        jsr video_ram_copy_line
-
-        set16im(tmp_row, screen_ptr)
-        set16im($d800 + 40 * [ROWS_COLOR_MIDDLE + ROWS_COLOR_UPPER + 2], screen_ptr_dest)
-        ldy #0               
-        ldx #1    
-        jmp video_ram_copy_line
-    }
     CharsShiftUpper: {
         set16(screen_base, screen_ptr)
         set16(screen_back_buffer_base, screen_ptr_dest)
@@ -189,10 +174,8 @@ Screen: {
         beq video_ram_copy_done
 
         ldy #0                  
-        inc $d020
         sub16im(screen_ptr, 40, screen_ptr)
         sub16im(screen_ptr_dest, 40, screen_ptr_dest)
-        inc $d020
         jmp video_ram_copy_line 
 
     video_ram_copy_done:
