@@ -86,6 +86,8 @@ IRQ: {
         lda Screen.vscroll
         cmp #07
         bne !+
+        lda Screen.change_scroll
+        beq !+
         jmp HandlerMiddle
     !:
         jmp HandlerFooter
