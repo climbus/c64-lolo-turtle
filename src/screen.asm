@@ -1,17 +1,14 @@
 
 Screen: {
     vscroll: .byte 0
-    change_scroll: .byte 0
     screen_buffer_nbr: .byte 0
     screen_base: .word 0      
     screen_back_buffer_base: .word 0
     
     tmp_row: .fill 40, 00
 
-    .label ROWS_PER_COPY = 12
     .label screen_ptr = $04
     .label color_ptr = $06
-    .label screen_row = $08
     .label screen_ptr_dest = $0a
     .label color_ptr_dest = $0c
         
@@ -25,8 +22,6 @@ Screen: {
         set16(screen_base, screen_ptr)
         add16im(screen_ptr, 40*25, screen_ptr)
         set16im($d800, color_ptr)
-        lda #0
-        sta change_scroll
         rts
     }
 
@@ -42,7 +37,7 @@ Screen: {
         sta VIC.BACKGROUND_COLOR
         
         jmp SwapScreens
-    after_swap:
+    AfterSwap:
 
         // Reset scroll register
         lda #$00
@@ -72,13 +67,13 @@ Screen: {
         set16im(tmp_row, screen_ptr_dest)
         ldy #0    
         ldx #1  
-        jsr video_ram_copy_line
+        jsr CopyLine
 
         set16im($d800 + 40 * [ROWS_COLOR_UPPER -1], screen_ptr)
         set16im($d800 + 40 * ROWS_COLOR_UPPER, screen_ptr_dest)
         ldy #0 
         ldx #ROWS_COLOR_UPPER
-        jmp video_ram_copy_line
+        jmp CopyLine
     }
 
     ColorShiftLower: {
@@ -86,13 +81,13 @@ Screen: {
         set16im($d800 + 40 * [ROWS_COLOR_UPPER + ROWS_COLOR_LOWER], screen_ptr_dest)
         ldy #0    
         ldx #ROWS_COLOR_LOWER
-        jsr video_ram_copy_line
+        jsr CopyLine
 
         set16im(tmp_row, screen_ptr)
         set16im($d800 + 40 * [ROWS_COLOR_UPPER + 1], screen_ptr_dest)
         ldy #0               
         ldx #1    
-        jmp video_ram_copy_line
+        jmp CopyLine
     }
 
     CharsShiftUpper: {
@@ -102,7 +97,7 @@ Screen: {
         add16im(screen_ptr_dest, 40 * ROWS_CHARS_PER_FRAME, screen_ptr_dest)
         ldy #0             
         ldx #ROWS_CHARS_PER_FRAME
-        jmp video_ram_copy_line
+        jmp CopyLine
     }
 
     CharsShiftLower: {
@@ -112,11 +107,10 @@ Screen: {
         add16im(screen_ptr_dest, 40 * [ROWS_CHARS_PER_FRAME * 2 -1], screen_ptr_dest)
         ldy #0                
         ldx #ROWS_CHARS_PER_FRAME
-        jmp video_ram_copy_line
+        jmp CopyLine
     }
 
-    video_ram_copy_line:
-                       
+    CopyLine:
         lda (screen_ptr), y
         sta (screen_ptr_dest), y
         iny
@@ -146,7 +140,7 @@ Screen: {
         iny
         
         cpy #36
-        bne video_ram_copy_line   
+        bne CopyLine   
 
         lda (screen_ptr), y
         sta (screen_ptr_dest), y
@@ -161,36 +155,36 @@ Screen: {
         sta (screen_ptr_dest), y
 
         dex                      
-        beq video_ram_copy_done
+        beq CopyDone
 
         ldy #0                  
         sub16im(screen_ptr, 40, screen_ptr)
         sub16im(screen_ptr_dest, 40, screen_ptr_dest)
-        jmp video_ram_copy_line 
+        jmp CopyLine 
 
-    video_ram_copy_done:
+    CopyDone:
         rts
 
     SwapScreens: {
-            lda screen_buffer_nbr
-            eor #$01 
-            sta screen_buffer_nbr
-            bne screen_swap_to_1
-            lda VIC.MEMORY_SETUP_REGISTER
-            and #$0f                  
-            //ora #$01                  
-            sta VIC.MEMORY_SETUP_REGISTER
-            set16im(VIC.SCREEN_RAM, screen_base)
-            set16im(VIC.SCREEN_RAM2, screen_back_buffer_base)
-            jmp ShiftBottom.after_swap
+        lda screen_buffer_nbr
+        eor #$01 
+        sta screen_buffer_nbr
+        bne !+
+        lda VIC.MEMORY_SETUP_REGISTER
+        and #$0f                  
+        sta VIC.MEMORY_SETUP_REGISTER
 
-        screen_swap_to_1: 
-            lda VIC.MEMORY_SETUP_REGISTER      
-            and #$0f      
-            ora #$10     
-            sta VIC.MEMORY_SETUP_REGISTER
-            set16im(VIC.SCREEN_RAM2, screen_base)
-            set16im(VIC.SCREEN_RAM, screen_back_buffer_base)
-            jmp ShiftBottom.after_swap
+        set16im(VIC.SCREEN_RAM, screen_base)
+        set16im(VIC.SCREEN_RAM2, screen_back_buffer_base)
+        jmp ShiftBottom.AfterSwap
+    !: 
+        lda VIC.MEMORY_SETUP_REGISTER      
+        and #$0f      
+        ora #$10     
+        sta VIC.MEMORY_SETUP_REGISTER
+
+        set16im(VIC.SCREEN_RAM2, screen_base)
+        set16im(VIC.SCREEN_RAM, screen_back_buffer_base)
+        jmp ShiftBottom.AfterSwap
     }
 }
