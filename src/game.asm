@@ -59,20 +59,6 @@ GAME: {
         rts
     }
 
-    AddPoints: {
-        clc
-        lda points
-        adc #100
-        sta points
-        lda points + 1
-        adc #00
-        sta points + 1
-        lda points + 2
-        adc #00
-        sta points + 2
-        rts
-    }
-
     MainLoop: {
         ldy #$00
         jsr VIC.WaitForFrame
@@ -85,6 +71,20 @@ GAME: {
         jsr HidePoints
         
         jmp MainLoop
+        rts
+    }
+
+    AddPoints: {
+        clc
+        lda points
+        adc #100
+        sta points
+        lda points + 1
+        adc #00
+        sta points + 1
+        lda points + 2
+        adc #00
+        sta points + 2
         rts
     }
 
