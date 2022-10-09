@@ -475,6 +475,10 @@ GAME: {
         jsr PLAYER.ApplyDamage
         rts
     !:
+        cmp #$01
+        bne !+
+        jsr PLAYER.GoBack
+    !:
         jsr PLAYER.ClearDamage
         rts
     }

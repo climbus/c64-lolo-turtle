@@ -65,6 +65,14 @@ PLAYER: {
         rts
     
     }
+
+    GoBack: {
+        inc playerY
+        lda playerY
+        sta VIC.SPRITE_0_Y
+        rts
+    }
+
     MoveLeft: {
         lda playerX
         sta platerLastPosition
