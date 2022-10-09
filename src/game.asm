@@ -7,6 +7,7 @@
 
 GAME: {
     .const MATERIAL_SOLID = $02
+    .const MATERIAL_HURT = $03
 
     .label Col = $04
     .label Row = $05
@@ -468,6 +469,13 @@ GAME: {
         jsr AddPoints
         rts
     !:
+        cmp #MATERIAL_HURT
+        bne !+
+        .break
+        jsr PLAYER.ApplyDamage
+        rts
+    !:
+        jsr PLAYER.ClearDamage
         rts
     }
 

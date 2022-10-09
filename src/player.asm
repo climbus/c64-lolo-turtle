@@ -8,6 +8,7 @@ PLAYER: {
     sframe:     .byte 04
     playerX:    .byte $aa
     playerY:    .byte $b0
+    onDamage:   .byte $00
     
     Init: {
     // point sprites
@@ -49,7 +50,21 @@ PLAYER: {
         sta VIC.SPRITE_1_Y
         rts
     }
+    
+    ApplyDamage: {
+        lda #01
+        sta onDamage
+        lda #01
+        sta VIC.ENABLE_SPRITE_REGISTER
+        rts
+    }
 
+    ClearDamage: {
+        lda #00
+        sta onDamage
+        rts
+    
+    }
     MoveLeft: {
         lda playerX
         sta platerLastPosition
@@ -68,11 +83,31 @@ PLAYER: {
         rts
     }
 
+    Hide: {
+        lda VIC.ENABLE_SPRITE_REGISTER
+        and #%11111110
+        sta VIC.ENABLE_SPRITE_REGISTER
+        rts
+    }
+
+    Show: {
+        lda VIC.ENABLE_SPRITE_REGISTER
+        and #%11111111
+        sta VIC.ENABLE_SPRITE_REGISTER
+        rts
+    }
 
     AnimateTurtle: {
         ldy sframe
         dey
+        bne !+++
+        lda onDamage
         bne !+
+        jsr Show
+        jmp !++
+    !:
+        jsr Hide
+    !:
         ldy #04
         ldx VIC.SCREEN_RAM + $3f8
         inx
