@@ -5,7 +5,6 @@ BasicUpstart2(Start)
 #import "macros.asm"
 #import "vic.asm"
 #import "player.asm"
-#import "apples.asm"
 #import "game.asm"
 #import "screen.asm"
 

@@ -2,7 +2,6 @@
 #import "level.asm"
 #import "player.asm"
 #import "collisions.asm"
-#import "apples.asm"
 #import "controls.asm"
 #import "irq.asm"
 
@@ -56,7 +55,6 @@ GAME: {
         lda #%00001100
         sta $d018
         jsr PLAYER.Init
-        jsr APPLES.init
         cli
         rts
     }
