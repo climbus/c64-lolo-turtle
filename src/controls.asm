@@ -11,7 +11,7 @@ CONTROLS: {
         lda JOY_PORT_2
         and #JOY_LT
         bne !+
-        lda GAME.left_material
+        lda COLLISIONS.left_material
         cmp #01
         beq !+
         jsr PLAYER.MoveLeft
@@ -21,7 +21,7 @@ CONTROLS: {
         lda JOY_PORT_2
         and #JOY_RT
         bne !+
-        lda GAME.right_material
+        lda COLLISIONS.right_material
         cmp #01
         beq !+
         jsr PLAYER.MoveRight

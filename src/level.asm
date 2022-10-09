@@ -217,4 +217,46 @@ LEVEL: {
         sta DrawNextRow.Tile + 2
         rts
     }
+
+    SetTailAt: {
+        .label SCREEN_POS = TMP2
+        txa
+        lsr
+        asl
+        tax
+        lda VIC.ScreenRowLSB,y
+        sta SCREEN_POS
+        LoadScreenMSB()
+        sta SCREEN_POS + 1
+        txa
+        tay
+        lda #$00
+        sta (SCREEN_POS),y
+        iny
+        sta (SCREEN_POS),y
+        sub16im(SCREEN_POS, 40, SCREEN_POS)
+        dey
+        lda #$00
+        sta (SCREEN_POS),y
+        iny
+        sta (SCREEN_POS),y
+        rts
+    }
+
+
 }
+
+Map:
+	.import binary "./assets/map.bin"
+MapEnd:
+
+Tiles:
+	.import binary "./assets/tiles.bin"
+
+Colors:
+	.import binary "./assets/colors.bin"
+
+* = $7000 "Charset"
+Chars:
+	.import binary "./assets/chars.bin"
+CharsEnd:

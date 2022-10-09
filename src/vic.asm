@@ -30,4 +30,18 @@ VIC: {
         bne WaitForFrame
         rts
     }
+
+    ScreenRowLSB:
+		.fill 40, <[VIC.SCREEN_RAM + i * $28]
+    ScreenRowMSB:
+		.fill 40, >[VIC.SCREEN_RAM + i * $28]
+
+    BufferRowMSB:
+		.fill 40, >[VIC.SCREEN_RAM2 + i * $28]
+
+    ColorRowLSB:
+		.fill 40, <[VIC.COLOR_RAM + i * $28]
+    ColorRowMSB:
+		.fill 40, >[VIC.COLOR_RAM + i * $28]
+
 }

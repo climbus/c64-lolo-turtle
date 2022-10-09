@@ -109,10 +109,10 @@
 .macro LoadScreenMSB() {
         lda Screen.screen_buffer_nbr
         bne !+
-        lda GAME.ScreenRowMSB,y
+        lda VIC.ScreenRowMSB,y
         jmp !++
     !:
-        lda GAME.BufferRowMSB,y
+        lda VIC.BufferRowMSB,y
         
     !:
 }
