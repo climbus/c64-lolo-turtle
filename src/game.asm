@@ -11,9 +11,9 @@ GAME: {
 
     .label Col = $04
     .label Row = $05
+
     .label temp2 = $fb
     .label temp3 = $fd
-    .label Counter = $07
     .label temp = $8
 
     TileScreenLocations2x2: 
