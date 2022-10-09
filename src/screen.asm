@@ -44,7 +44,7 @@ Screen: {
         sta vscroll
         UpdateScrollRegister(vscroll)
 
-        jsr GAME.DrawNextRow
+        jsr LEVEL.DrawNextRow
         rts
     !:
         cmp #$04

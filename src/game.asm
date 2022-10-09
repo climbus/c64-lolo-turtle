@@ -1,4 +1,5 @@
 #import "vic.asm"
+#import "level.asm"
 #import "player.asm"
 #import "apples.asm"
 #import "controls.asm"
@@ -9,24 +10,9 @@ GAME: {
     .const MATERIAL_SOLID = $02
     .const MATERIAL_HURT = $03
 
-    .label Col = TMP4
-    .label Row = TMP5
 
-    .label temp2 = $fb
-    .label temp3 = $fd
-    .label temp = $8
-
-    TileScreenLocations2x2: 
-        .byte 0,1,40,41
-
-    TileScreenLocations2x2OneLine: 
-        .byte 0,1,0,1
-
-    show_points_counter: .byte 00
-    offset:	.byte 00
+    showPointsCounter: .byte 00
     points: .byte 00, 00, 00
-    game_counter: .byte 00, 00
-    rows_count: .byte $0b
     front_material: .byte 00
     left_material: .byte 00
     right_material: .byte 00
@@ -45,9 +31,6 @@ GAME: {
 		.fill 40, <[VIC.COLOR_RAM + i * $28]
     ColorRowMSB:
 		.fill 40, >[VIC.COLOR_RAM + i * $28]
-
-    tmp_tile: .byte 00, 00 
-    current_tile_row: .byte 2
 
     Init: {
         sei
@@ -97,218 +80,16 @@ GAME: {
         rts
     }
 
-    DrawNextRow: {   
-        set16(Screen.screen_base, Scr + 1)
-        lda #<VIC.COLOR_RAM
-        sta Color + 1
-        lda #>VIC.COLOR_RAM
-        sta Color + 2
-        add16im(Scr + 1, 38, Scr +1)
-        add16im(Color + 1, 38, Color + 1)
-
-        lda current_tile_row
-        cmp #$00
-        bne !+
-        set16(tmp_tile, Tile +1)    
-    !:
-        lda current_tile_row
-        cmp #02
-        bne !+
-        set16(Tile + 1, tmp_tile)
-    !:
-        lda #$00
-        sta Col
-    !ColLoop:
-        ldy current_tile_row
-
-        lda #$00
-        sta TileLookup + 2
-
-    Tile:
-        lda $BEEF	
-        sta TileLookup + 1		
-        asl TileLookup + 1
-        rol TileLookup + 2
-        asl TileLookup + 1
-        rol TileLookup + 2
-
-        //Add the MAP_TILES address
-        clc
-        lda #<Tiles
-        adc TileLookup + 1
-        sta TileLookup + 1
-        lda #>Tiles
-        adc TileLookup + 2
-        sta TileLookup + 2
-
-    TileLookup:
-        lda $beef,y
-        ldx TileScreenLocations2x2OneLine,y
-    Scr:
-        sta $beef,x
-        tax
-        lda Colors,x
-        ldx TileScreenLocations2x2OneLine,y 
-    Color:
-        sta $BEEF, x //Self modified color ram
-        iny
-        cpy #$02
-        beq !+
-        cpy #$04
-        beq !+
-        jmp TileLookup
-!:
-        sec 
-        lda Tile + 1
-        sbc #$01
-        sta Tile + 1
-        lda Tile + 2
-        sbc #$00
-        sta Tile + 2
-        sec
-        lda Scr + 1
-        sbc #$02
-        sta Scr + 1
-        sta Color + 1
-        bcs !+
-        dec Scr + 2
-        dec Color + 2
-  !:
-
-        inc Col
-        ldx Col
-        cpx #20
-        beq !+
-        jmp !ColLoop-
-  !:
-
-        lda current_tile_row
-        eor #2
-        sta current_tile_row
-        rts
-    }
-
-    // screen draw start
-    // color draw start
-    // num rows
-    // map position
-    DrawScreen: {   
-
-        lda #<VIC.SCREEN_RAM + $03e7 - [40 * 6] - 1
-        sta DrawRows.Scr + 1
-        sta DrawRows.Color + 1
-
-        lda #>VIC.SCREEN_RAM + $03e7 - [40 * 6] - 1
-        sta DrawRows.Scr + 2
-        lda #>VIC.COLOR_RAM + $03e7 - [40 * 6] - 1
-        sta DrawRows.Color + 2
-
-        lda #<MapEnd - 1
-        sta DrawRows.Tile + 1
-        lda #>MapEnd - 1
-        sta DrawRows.Tile + 2
-    }
-
-    DrawRows: { 
-        
-        lda #$00
-        sta Row
-    !RowLoop:
-        lda #$00
-        sta Col
-    !ColLoop:
-        ldy #$00
-
-        lda #$00
-        sta TileLookup + 2
-
-    Tile:
-        lda $BEEF	
-        sta TileLookup + 1		
-        asl TileLookup + 1
-        rol TileLookup + 2
-        asl TileLookup + 1
-        rol TileLookup + 2
-
-        //Add the MAP_TILES address
-        clc
-        lda #<Tiles
-        adc TileLookup + 1
-        sta TileLookup + 1
-        lda #>Tiles
-        adc TileLookup + 2
-        sta TileLookup + 2
-
-    TileLookup:
-        lda $beef,y
-        ldx TileScreenLocations2x2,y
-    Scr:
-        sta $beef,x
-        tax
-        lda Colors,x
-        ldx TileScreenLocations2x2, y 
-    Color:
-        sta $BEEF, x //Self modified color ram
-
-        iny
-        cpy #$04
-        bne TileLookup
-
-        sec 
-        lda Tile + 1
-        sbc #$01
-        sta Tile + 1
-        lda Tile + 2
-        sbc #$00
-        sta Tile + 2
-
-        sec
-        lda Scr + 1
-        sbc #$02
-        sta Scr + 1
-        sta Color + 1
-        bcs !+
-        dec Scr + 2
-        dec Color + 2
-  !:
-
-        inc Col
-        ldx Col
-        cpx #20
-        beq !+
-        jmp !ColLoop-
-  !:
-        sec
-        lda Scr + 1
-        lda Color + 1
-        sbc #$28
-        sta Scr + 1
-        sta Color + 1
-        bcs !+
-        dec Scr + 2
-        dec Color + 2
-  !:
-        inc Row
-        ldx Row
-        cpx rows_count
-        beq !+
-        jmp !RowLoop-
-!:
-        lda Tile + 1
-        sta DrawNextRow.Tile + 1
-        lda Tile + 2
-        sta DrawNextRow.Tile + 2
-        rts
-    }
-
     GetCharPosition: {
         // x - x offset
         // y - y offset
-        stx temp2
-        sty temp2 + 1
+        .label OFFSET_X = TMP2
+        .label OFFSET_Y = TMP3
+        stx OFFSET_X
+        sty OFFSET_Y
         lda PLAYER.playerY
         sec
-        sbc temp2 + 1
+        sbc OFFSET_Y
         lsr
         lsr
         lsr
@@ -316,7 +97,7 @@ GAME: {
         
         lda PLAYER.playerX
         sec
-        sbc temp2
+        sbc OFFSET_X
         lsr
         lsr
         lsr
@@ -329,8 +110,8 @@ GAME: {
 
     CheckCollisions: {
         // calculate row and col of player position
-        .label ROW = temp
-        .label COL = temp + 1
+        .label ROW = TMP2
+        .label COL = TMP3
         
         ldx #16
         ldy #44
@@ -407,56 +188,27 @@ GAME: {
     }
 
     SetTailAt: {
+        .label SCREEN_POS = TMP2
         txa
         lsr
         asl
         tax
         lda ScreenRowLSB,y
-        sta temp
+        sta SCREEN_POS
         LoadScreenMSB()
-        sta temp + 1
+        sta SCREEN_POS + 1
         txa
         tay
         lda #$00
-        sta (temp),y
+        sta (SCREEN_POS),y
         iny
-        sta (temp),y
-        sub16im(temp, 40, temp)
+        sta (SCREEN_POS),y
+        sub16im(SCREEN_POS, 40, SCREEN_POS)
         dey
         lda #$00
-        sta (temp),y
+        sta (SCREEN_POS),y
         iny
-        sta (temp),y
-
-        rts
-    }
-
-    SetCharacterAt: {
-        sta temp
-        lda ColorRowLSB,y
-        sta PLAYER.playerScreenPosition
-        lda ColorRowMSB,y
-        sta PLAYER.playerScreenPosition+1
-        sty temp + 1
-        txa
-        tay
-
-        lda #06
-        sta (PLAYER.playerScreenPosition),y
-        ldy temp + 1
-        
-        lda ScreenRowLSB,y
-        sta PLAYER.playerScreenPosition
-        LoadScreenMSB()
-        sta PLAYER.playerScreenPosition+1
-        sty temp + 1
-        txa
-        tay
-
-        lda #$c0
-        .break
-        sta (PLAYER.playerScreenPosition),y
-        ldy temp + 1
+        sta (SCREEN_POS),y
         rts
     }
 
@@ -515,23 +267,10 @@ GAME: {
         jsr PLAYER.AnimateTurtle
         jsr HidePoints
         
-        lda game_counter
-        cmp #$05
-        bne MainLoop
+        jmp MainLoop
         rts
     }
 
-    UpdateCounter: {
-        clc
-        lda game_counter + 1
-        adc #$01
-        sta game_counter + 1
-
-        lda game_counter
-        adc #00
-        sta game_counter
-        rts
-    }
     ShowPoints: {
         lda PLAYER.playerX
         adc #20
@@ -543,45 +282,21 @@ GAME: {
         ora #%00000010
         sta VIC.ENABLE_SPRITE_REGISTER
         lda #20
-        sta show_points_counter
+        sta showPointsCounter
         rts
     }
 
     HidePoints: {
-        ldx show_points_counter
+        ldx showPointsCounter
         cpx #$00
         beq !+
             dex
-            stx show_points_counter
+            stx showPointsCounter
             rts
     !:
         lda VIC.ENABLE_SPRITE_REGISTER
         and #%11111101
         sta VIC.ENABLE_SPRITE_REGISTER
-        rts
-    }
-    ScrollScreen: {
-        // hardware scroll
-        lda VIC.SCROLL_REGISTER
-        and #%11110000
-        ora offset
-        sta VIC.SCROLL_REGISTER
-
-        ldx offset
-        cpx #$01
-        bne !+
-        //jsr APPLES.check_last
-        //jsr APPLES.move
-        //jsr APPLES.GrabNew
-    !:  
-        ldx offset
-        cpx #$07
-        bne !+
-        ldx #00
-        //inc APPLES.counter
-    !:
-        inx
-        stx offset 
         rts
     }
 }
