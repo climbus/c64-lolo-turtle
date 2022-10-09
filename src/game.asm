@@ -27,6 +27,9 @@ GAME: {
     points: .byte 00, 00, 00
     game_counter: .byte 00, 00
     rows_count: .byte $0b
+    front_material: .byte 00
+    front_row: .byte 00
+    front_col: .byte 00
 
     ScreenRowLSB:
 		.fill 40, <[VIC.SCREEN_RAM + i * $28]
@@ -327,7 +330,9 @@ GAME: {
         jsr GetCharPosition
         
         stx ROW
+        stx front_row
         sty COL
+        sty front_col
 
         jsr GetCharacterAt
 
@@ -339,21 +344,7 @@ GAME: {
         // ////////////
         
         jsr GetMaterial
-        cmp #MATERIAL_SOLID
-        bne !+
-        .break
-        ldx ROW
-        ldy COL
-        jsr SetTailAt
-
-        lda PLAYER.playerScreenPosition + 1
-        sbc #VIC.SCREEN_MSB
-        tax
-        lda PLAYER.playerScreenPosition
-        jsr ShowPoints
-        jsr AddPoints
-        rts
-    !:
+        sta front_material
         
     //     cmp #$03
     //     beq !+
@@ -461,20 +452,36 @@ GAME: {
         rts
     }
 
+    ActFrontCollisions: {
+        lda front_material
+        cmp #MATERIAL_SOLID
+        bne !+
+        ldx front_row
+        ldy front_col
+        jsr SetTailAt
+
+        lda PLAYER.playerScreenPosition + 1
+        sbc #VIC.SCREEN_MSB
+        tax
+        lda PLAYER.playerScreenPosition
+        jsr ShowPoints
+        jsr AddPoints
+        rts
+    !:
+        rts
+    }
+
     MainLoop: {
         ldy #$00
         jsr VIC.WaitForFrame
         
         jsr CONTROLS.ReadJoy
         jsr CheckCollisions
-        //jsr ScrollScreen
+        jsr ActFrontCollisions
+        
         jsr PLAYER.AnimateTurtle
         jsr HidePoints
-        //jsr UpdateCounter
-    
-
-        //ldy #$ff
-        //jsr VIC.WaitForFrame
+        
         lda game_counter
         cmp #$05
         bne MainLoop
