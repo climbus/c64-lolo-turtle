@@ -1,3 +1,5 @@
+#import "zero_page.asm"
+
 BasicUpstart2(Start)
 
 #import "macros.asm"
@@ -17,3 +19,4 @@ Start:
 
 * = $6000
 .import binary "assets/sprites.bin"
+

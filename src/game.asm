@@ -9,8 +9,8 @@ GAME: {
     .const MATERIAL_SOLID = $02
     .const MATERIAL_HURT = $03
 
-    .label Col = $04
-    .label Row = $05
+    .label Col = TMP4
+    .label Row = TMP5
 
     .label temp2 = $fb
     .label temp3 = $fd
@@ -21,8 +21,6 @@ GAME: {
 
     TileScreenLocations2x2OneLine: 
         .byte 0,1,0,1
-
-    .label ROAD_COLOR = $0c
 
     show_points_counter: .byte 00
     offset:	.byte 00
