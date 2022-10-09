@@ -11,7 +11,8 @@ GAME: {
 
     .label Col = $04
     .label Row = $05
-    .label ScrollOffset = $06
+    .label temp2 = $fb
+    .label temp3 = $fd
     .label Counter = $07
     .label temp = $8
 
@@ -29,6 +30,8 @@ GAME: {
     game_counter: .byte 00, 00
     rows_count: .byte $0b
     front_material: .byte 00
+    left_material: .byte 00
+    right_material: .byte 00
     front_row: .byte 00
     front_col: .byte 00
 
@@ -301,10 +304,13 @@ GAME: {
     }
 
     GetCharPosition: {
-        
+        // x - x offset
+        // y - y offset
+        stx temp2
+        sty temp2 + 1
         lda PLAYER.playerY
         sec
-        sbc #44
+        sbc temp2 + 1
         lsr
         lsr
         lsr
@@ -312,7 +318,7 @@ GAME: {
         
         lda PLAYER.playerX
         sec
-        sbc #16
+        sbc temp2
         lsr
         lsr
         lsr
@@ -327,7 +333,9 @@ GAME: {
         // calculate row and col of player position
         .label ROW = temp
         .label COL = temp + 1
-
+        
+        ldx #16
+        ldy #44
         jsr GetCharPosition
         
         stx ROW
@@ -346,7 +354,22 @@ GAME: {
         
         jsr GetMaterial
         sta front_material
-        
+       
+
+        ldx #26
+        ldy #43
+        jsr GetCharPosition
+        jsr GetCharacterAt
+        // debug ////
+        jsr GetMaterial
+        sta left_material
+
+        ldx #00
+        ldy #43
+        jsr GetCharPosition
+        jsr GetCharacterAt
+        jsr GetMaterial
+        sta right_material
     //     cmp #$03
     //     beq !+
     //     lda PLAYER.platerLastPosition
