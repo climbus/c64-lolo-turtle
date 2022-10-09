@@ -105,3 +105,14 @@
     lda #1
     sta $d800+40*24+column
 }
+
+.macro LoadScreenMSB() {
+        lda Screen.screen_buffer_nbr
+        bne !+
+        lda GAME.ScreenRowMSB,y
+        jmp !++
+    !:
+        lda GAME.BufferRowMSB,y
+        
+    !:
+}

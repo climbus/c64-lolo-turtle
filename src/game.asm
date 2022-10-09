@@ -6,6 +6,8 @@
 
 
 GAME: {
+    .const MATERIAL_SOLID = $02
+
     .label Col = $04
     .label Row = $05
     .label ScrollOffset = $06
@@ -30,6 +32,14 @@ GAME: {
 		.fill 40, <[VIC.SCREEN_RAM + i * $28]
     ScreenRowMSB:
 		.fill 40, >[VIC.SCREEN_RAM + i * $28]
+
+    BufferRowMSB:
+		.fill 40, >[VIC.SCREEN_RAM2 + i * $28]
+
+    ColorRowLSB:
+		.fill 40, <[VIC.COLOR_RAM + i * $28]
+    ColorRowMSB:
+		.fill 40, >[VIC.COLOR_RAM + i * $28]
 
     tmp_tile: .byte 00, 00 
     current_tile_row: .byte 2
@@ -290,7 +300,7 @@ GAME: {
         
         lda PLAYER.playerY
         sec
-        sbc #50
+        sbc #44
         lsr
         lsr
         lsr
@@ -298,7 +308,7 @@ GAME: {
         
         lda PLAYER.playerX
         sec
-        sbc #11
+        sbc #16
         lsr
         lsr
         lsr
@@ -321,29 +331,28 @@ GAME: {
 
         jsr GetCharacterAt
 
-    
-        // // debug ////
-        // lda #00
+        // debug ////
+        // lda #$c0
         // sta (PLAYER.playerScreenPosition),y
         // iny
         // sta (PLAYER.playerScreenPosition),y
         // ////////////
-
-        cmp #$4e
+        
+        jsr GetMaterial
+        cmp #MATERIAL_SOLID
         bne !+
-            ldx ROW
-            ldy COL
-            lda #$03
-            jsr SetCharacterAt
+        .break
+        ldx ROW
+        ldy COL
+        jsr SetTailAt
 
-            lda PLAYER.playerScreenPosition + 1
-            sbc #VIC.SCREEN_MSB
-            tax
-            lda PLAYER.playerScreenPosition
-            jsr APPLES.remove
-            jsr ShowPoints
-            jsr AddPoints
-            rts
+        lda PLAYER.playerScreenPosition + 1
+        sbc #VIC.SCREEN_MSB
+        tax
+        lda PLAYER.playerScreenPosition
+        jsr ShowPoints
+        jsr AddPoints
+        rts
     !:
         
     //     cmp #$03
@@ -361,7 +370,7 @@ GAME: {
         // y - col position
         lda ScreenRowLSB,y
         sta PLAYER.playerScreenPosition
-        lda ScreenRowMSB,y
+        LoadScreenMSB()
         sta PLAYER.playerScreenPosition+1
 
         txa
@@ -370,19 +379,71 @@ GAME: {
         // a - character
         rts
     }
+    
+    GetMaterial: {
+        // a - character
+        tax
+        lda Colors,x
+        and #%11110000
+        lsr
+        lsr
+        lsr
+        lsr
+        // a - material number
+        rts
+    }
+
+    SetTailAt: {
+        txa
+        lsr
+        asl
+        tax
+        lda ScreenRowLSB,y
+        sta temp
+        LoadScreenMSB()
+        sta temp + 1
+        txa
+        tay
+        lda #$00
+        sta (temp),y
+        iny
+        sta (temp),y
+        sub16im(temp, 40, temp)
+        dey
+        lda #$00
+        sta (temp),y
+        iny
+        sta (temp),y
+
+        rts
+    }
 
     SetCharacterAt: {
         sta temp
-        lda ScreenRowLSB,y
+        lda ColorRowLSB,y
         sta PLAYER.playerScreenPosition
-        lda ScreenRowMSB,y
+        lda ColorRowMSB,y
         sta PLAYER.playerScreenPosition+1
-
+        sty temp + 1
         txa
         tay
 
-        lda temp
+        lda #06
         sta (PLAYER.playerScreenPosition),y
+        ldy temp + 1
+        
+        lda ScreenRowLSB,y
+        sta PLAYER.playerScreenPosition
+        LoadScreenMSB()
+        sta PLAYER.playerScreenPosition+1
+        sty temp + 1
+        txa
+        tay
+
+        lda #$c0
+        .break
+        sta (PLAYER.playerScreenPosition),y
+        ldy temp + 1
         rts
     }
 
@@ -403,13 +464,13 @@ GAME: {
     MainLoop: {
         ldy #$00
         jsr VIC.WaitForFrame
+        
         jsr CONTROLS.ReadJoy
         jsr CheckCollisions
         //jsr ScrollScreen
-        jsr APPLES.draw
         jsr PLAYER.AnimateTurtle
         jsr HidePoints
-        jsr UpdateCounter
+        //jsr UpdateCounter
     
 
         //ldy #$ff
