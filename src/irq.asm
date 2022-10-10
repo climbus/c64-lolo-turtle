@@ -51,11 +51,10 @@ IRQ: {
 
         lda #00
         sta VIC.BACKGROUND_COLOR
+       
+        DisableMulticolorMode()
 
-        lda VIC.SCROLL_REGISTER
-        and #%11111000
-        sta VIC.SCROLL_REGISTER
-
+        UpdateScrollRegisterNum(7)
         lda Screen.vscroll
         cmp #07
         bne !+
@@ -68,9 +67,9 @@ IRQ: {
 
     IRQBeginVBlank: {
         IRQStart()
+        EnableMulticolorMode()
 
         jsr Screen.ShiftBottom
-
         lda Screen.vscroll
         cmp #07
         bne !+

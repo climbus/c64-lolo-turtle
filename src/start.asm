@@ -7,11 +7,13 @@ BasicUpstart2(Start)
 #import "player.asm"
 #import "game.asm"
 #import "screen.asm"
+#import "hud.asm"
 
 Start:
     jsr GAME.Init
-    jsr LEVEL.DrawScreen
     jsr Screen.Init
+    jsr LEVEL.DrawScreen
+    jsr HUD.Draw
     jsr IRQ.Setup
     jsr GAME.MainLoop
     rts

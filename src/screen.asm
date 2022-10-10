@@ -55,10 +55,10 @@ Screen: {
         bne !+
         jsr CharsShiftLower
     !:
+        UpdateScrollRegister(vscroll)
         lda #$08
         sta VIC.BACKGROUND_COLOR
 
-        UpdateScrollRegister(vscroll)
         rts
     }
 

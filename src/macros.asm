@@ -88,6 +88,14 @@
     sta VIC.SCROLL_REGISTER
 }
 
+.macro UpdateScrollRegisterNum(value) {
+    lda VIC.SCROLL_REGISTER
+    and #$f8
+    clc
+    adc #value
+    sta VIC.SCROLL_REGISTER
+}
+
 .macro update_y_scroll(xvalue) {  // set horizontal softscroll value to xvalue
     lda $d011
     and #$F8
@@ -115,4 +123,16 @@
         lda VIC.BufferRowMSB,y
         
     !:
+}
+
+.macro EnableMulticolorMode() {
+        lda $d016
+        ora #%00010000
+        sta $d016
+}
+
+.macro DisableMulticolorMode() {
+        lda $d016
+        and #%11101111
+        sta $d016
 }

@@ -22,11 +22,9 @@ GAME: {
 
         lda $d011
         and #%10110111
+
         sta $d011
-        // multicolor color mode
-        lda $d016
-        ora #%00010000
-        sta $d016
+        EnableMulticolorMode()
 
         // set road background color
         lda #$0b
