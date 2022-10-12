@@ -126,7 +126,6 @@ COLLISIONS: {
     !:
         cmp #MATERIAL_HURT
         bne !+
-        .break
         jsr PLAYER.ApplyDamage
         rts
     !:
