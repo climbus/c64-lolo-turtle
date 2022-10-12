@@ -9,7 +9,7 @@
 GAME: {
 
     showPointsCounter: .byte 00
-    points: .byte 00, 00, 00
+    points: .byte 00, 00, 00, 00
 
     Init: {
 
@@ -67,6 +67,7 @@ GAME: {
         
         jsr PLAYER.AnimateTurtle
         jsr HidePoints
+        jsr HUD.ShowPoints
         
         jmp MainLoop
         rts
@@ -83,6 +84,10 @@ GAME: {
         lda points + 2
         adc #00
         sta points + 2
+        lda points + 3
+        adc #00
+        sta points + 3
+        .break
         rts
     }
 
