@@ -28,4 +28,12 @@ CONTROLS: {
     !:
         rts
     }
+
+    WaitForFire: {
+    !:
+        lda JOY_PORT_2
+        and #$10 
+        bne !-
+        rts
+    }
 }
