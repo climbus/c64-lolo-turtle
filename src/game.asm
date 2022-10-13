@@ -78,6 +78,14 @@ GAME: {
         dec energy
     !:
 
+        lda PLAYER.onDamage
+        beq !+
+        lda COUNTER
+        and #$07
+        bne !+
+        dec energy
+    !:
+
         jsr HUD.ShowPoints
         jsr HUD.ShowEnergy
         
