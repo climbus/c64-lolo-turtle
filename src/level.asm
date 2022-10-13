@@ -10,8 +10,7 @@ LEVEL: {
 
     DrawNextRow: {   
         .label COL = TMP4
-        .label ROW = TMP5
-        .label TMP_TILE = TMP6
+        .label TMP_TILE = TMP5
 
         set16(Screen.screen_base, Scr + 1)
         lda #<VIC.COLOR_RAM

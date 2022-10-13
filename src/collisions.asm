@@ -122,6 +122,7 @@ COLLISIONS: {
         lda PLAYER.playerScreenPosition
         jsr GAME.ShowPoints
         jsr GAME.AddPoints
+        inc GAME.energy
         rts
     !:
         cmp #MATERIAL_HURT

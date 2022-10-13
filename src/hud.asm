@@ -1,11 +1,11 @@
 HUD: {
-    .label SCREEN = TMP6
-    .label COLOR = TMP4
     .const START_CHAR = 40 * 21
     .const CHAR_COUNT = 120
 
-    .const POINTS_START_ADDR= $378
+    .const POINTS_START_ADDR = $378
     .const DIGITS_START_CHAR = $9a
+    .const ENERGY_START_ADDR = $387
+    .const HEART_CHAR = $b0
 
     decPoints: .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
     hexPoints: .byte 00, 00, 00, 00
@@ -76,6 +76,32 @@ HUD: {
         rol hexPoints + 1
         rol hexPoints + 2
         dey
+        bpl !Loop-
+        rts
+    }
+
+    ShowEnergy: { 
+        ldx #$08
+        ldy #$00
+    !Loop:  
+        lda #HEART_CHAR
+        cpx GAME.energy
+        bcc !+
+        lda #$00
+    !:  
+        sta VIC.SCREEN_RAM + ENERGY_START_ADDR,y
+        sta VIC.SCREEN_RAM2 + ENERGY_START_ADDR,y
+        lda GAME.energy
+        cmp #04
+        bcs !+
+        lda #RED
+        jmp !++
+    !:
+        lda #WHITE
+    !:
+        sta VIC.COLOR_RAM + ENERGY_START_ADDR,y
+        iny
+        dex
         bpl !Loop-
         rts
     }

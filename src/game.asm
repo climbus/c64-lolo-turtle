@@ -10,6 +10,7 @@ GAME: {
 
     showPointsCounter: .byte 00
     points: .byte 00, 00, 00, 00
+    energy: .byte $0f
 
     Init: {
 
@@ -54,6 +55,8 @@ GAME: {
         sta $d018
         jsr PLAYER.Init
         cli
+        lda #$08
+        sta energy
         rts
     }
 
@@ -67,7 +70,16 @@ GAME: {
         
         jsr PLAYER.AnimateTurtle
         jsr HidePoints
+
+        inc COUNTER
+        lda COUNTER
+        and #$1f
+        bne !+
+        dec energy
+    !:
+
         jsr HUD.ShowPoints
+        jsr HUD.ShowEnergy
         
         jmp MainLoop
         rts
@@ -87,7 +99,6 @@ GAME: {
         lda points + 3
         adc #00
         sta points + 3
-        .break
         rts
     }
 

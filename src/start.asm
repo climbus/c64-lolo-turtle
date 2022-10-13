@@ -15,6 +15,8 @@ Start:
     jsr LEVEL.DrawScreen
     jsr HUD.Draw
     jsr IRQ.Setup
+    lda #$00
+    sta COUNTER
     jsr GAME.MainLoop
     rts
 

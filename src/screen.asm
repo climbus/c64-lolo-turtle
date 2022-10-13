@@ -7,10 +7,10 @@ Screen: {
     
     tmp_row: .fill 40, 00
 
-    .label screen_ptr = $04
-    .label color_ptr = $06
-    .label screen_ptr_dest = $0a
-    .label color_ptr_dest = $0c
+    .label screen_ptr = IRQ_TMP1
+    .label color_ptr = IRQ_TMP3
+    .label screen_ptr_dest = IRQ_TMP5
+    .label color_ptr_dest = IRQ_TMP7
         
     .const ROWS_COLOR_UPPER = 8
     .const ROWS_COLOR_LOWER = 11
