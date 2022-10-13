@@ -22,6 +22,8 @@ Screen: {
         set16(screen_base, screen_ptr)
         add16im(screen_ptr, 40*25, screen_ptr)
         set16im($d800, color_ptr)
+        lda #$00
+        sta vscroll
         rts
     }
 

@@ -53,7 +53,9 @@ GAME: {
         // setup character memory and screen memory
         lda #%00001100
         sta $d018
+
         jsr PLAYER.Init
+        
         cli
         lda #$08
         sta energy
@@ -89,7 +91,23 @@ GAME: {
         jsr HUD.ShowPoints
         jsr HUD.ShowEnergy
         
+        lda energy
+        bne !+
+        .break
+
+        sei
+        ldy #$7f      // 01111111 
+        sty $dc0d     // turn off CIA timer interrupt
+        lda $dc0d     // cancel any pending IRQs
+        lda #$00
+        sta $d01a     // enable VIC-II Raster Beam IRQ
+        lda #$ff
+        sta $fffe
+        sta $ffff
+        jmp Start
+    !:
         jmp MainLoop
+    
         rts
     }
 

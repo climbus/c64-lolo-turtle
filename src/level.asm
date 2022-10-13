@@ -214,6 +214,10 @@ LEVEL: {
         sta DrawNextRow.Tile + 1
         lda Tile + 2
         sta DrawNextRow.Tile + 2
+        
+        lda #02
+        sta currentTileRow
+        .break
         rts
     }
 
