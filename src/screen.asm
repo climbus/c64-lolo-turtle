@@ -24,6 +24,7 @@ Screen: {
         set16im($d800, color_ptr)
         lda #$00
         sta vscroll
+        sta screen_buffer_nbr
         rts
     }
 

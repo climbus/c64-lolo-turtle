@@ -93,6 +93,14 @@ GAME: {
         
         lda energy
         bne !+
+        jsr Restart
+    !:
+        jmp MainLoop
+    
+        rts
+    }
+
+    Restart: {
         sei
         ldy #$7f      // 01111111 
         sty $dc0d     // turn off CIA timer interrupt
@@ -102,11 +110,15 @@ GAME: {
         lda #$ff
         sta $fffe
         sta $ffff
+        
+        lda #$00
+        sta points
+        sta points + 1
+        sta points + 2
+        sta points + 3
         jsr CONTROLS.WaitForFire
         jmp Start
-    !:
-        jmp MainLoop
-    
+
         rts
     }
 
