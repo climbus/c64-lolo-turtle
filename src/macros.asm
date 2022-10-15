@@ -125,6 +125,16 @@
     !:
 }
 
+.macro LoadBufferMSB() {
+        lda Screen.screen_buffer_nbr
+        bne !+
+        lda VIC.BufferRowMSB,y
+        jmp !++
+    !:
+        lda VIC.ScreenRowMSB,y
+        
+    !:
+}
 .macro EnableMulticolorMode() {
         lda $d016
         ora #%00010000

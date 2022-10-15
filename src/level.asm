@@ -1,4 +1,6 @@
 LEVEL: {
+    .label SCREEN_POS = TMP2
+
     TileScreenLocations2x2: 
         .byte 0,1,40,41
 
@@ -217,28 +219,49 @@ LEVEL: {
         
         lda #02
         sta currentTileRow
-        .break
         rts
     }
 
     SetTailAt: {
-        .label SCREEN_POS = TMP2
         txa
         lsr
         asl
         tax
+        tya
+        lsr
+        asl
+        tay
+        
+        LoadScreenMSB()
+        jsr SetTail
+        LoadBufferMSB()
+        jsr SetTail
+        rts
+    }
+
+    SetTail: {
+        sta SCREEN_POS + 1
+
         lda VIC.ScreenRowLSB,y
         sta SCREEN_POS
-        LoadScreenMSB()
-        sta SCREEN_POS + 1
+
         txa
         tay
-        lda #$00
-        sta (SCREEN_POS),y
-        iny
-        sta (SCREEN_POS),y
+        jsr SetTileLine
+        lda Screen.screen_buffer_nbr
+        bne !+
+        add16im(SCREEN_POS, 40, SCREEN_POS)
+        jmp !++
+    !:
         sub16im(SCREEN_POS, 40, SCREEN_POS)
+    !:
+
         dey
+        jsr SetTileLine
+        rts
+    }
+
+    SetTileLine: {
         lda #$00
         sta (SCREEN_POS),y
         iny
