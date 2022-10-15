@@ -75,7 +75,7 @@ GAME: {
 
         inc COUNTER
         lda COUNTER
-        and #$1f
+        and #$3f
         bne !+
         dec energy
     !:
