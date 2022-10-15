@@ -2,12 +2,14 @@
 #import "vic.asm"
 
 PLAYER: {
+    .const PLAYER_START_X = $aa
+    .const PLAYER_START_Y = $b0
     .label playerScreenPosition = $15
     .label platerLastPosition = $17
     
     sframe:     .byte 04
-    playerX:    .byte $aa
-    playerY:    .byte $b0
+    playerX:    .byte PLAYER_START_X
+    playerY:    .byte PLAYER_START_Y
     onDamage:   .byte $00
     
     Init: {
@@ -39,10 +41,13 @@ PLAYER: {
         sta $d01c
 
         // sprite coordinates
-        lda playerX
+        
+        lda #PLAYER_START_X
+        sta playerX
         sta VIC.SPRITE_0_X
 
-        lda playerY
+        lda #PLAYER_START_Y
+        sta playerY
         sta VIC.SPRITE_0_Y
 
         lda #200
