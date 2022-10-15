@@ -41,8 +41,8 @@ COLLISIONS: {
         .label ROW = TMP2
         .label COL = TMP3
         
-        ldx #16
-        ldy #44
+        ldx #12
+        ldy #43
         jsr GetCharPosition
         
         stx ROW
@@ -51,17 +51,10 @@ COLLISIONS: {
         sty front_col
 
         jsr GetCharacterAt
-
-        // debug ////
-        // lda #$c0
-        // sta (PLAYER.playerScreenPosition),y
-        // iny
-        // sta (PLAYER.playerScreenPosition),y
-        // ////////////
+        //PrintDebugChar()
         
         jsr GetMaterial
         sta front_material
-       
 
         ldx #26
         ldy #43

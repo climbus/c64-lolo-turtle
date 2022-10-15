@@ -136,3 +136,17 @@
         and #%11101111
         sta $d016
 }
+
+.macro PrintDebugChar() {
+    lda #$c0
+    sta (PLAYER.playerScreenPosition),y
+    clc 
+    lda PLAYER.playerScreenPosition
+    adc #40
+    sta PLAYER.playerScreenPosition
+    lda #00
+    sta (PLAYER.playerScreenPosition),y
+
+    //iny
+    //sta (PLAYER.playerScreenPosition),y
+}
