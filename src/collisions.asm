@@ -120,7 +120,7 @@ COLLISIONS: {
     ActFrontCollisions: {
         lda front_material
         cmp #MATERIAL_SOLID
-        bne !+
+        bne !++
         ldx front_row
         ldy front_col
         jsr LEVEL.SetTailAt
@@ -131,7 +131,11 @@ COLLISIONS: {
         lda PLAYER.playerScreenPosition
         jsr GAME.ShowPoints
         jsr GAME.AddPoints
+        lda GAME.energy
+        cmp #$08
+        bcs !+
         inc GAME.energy
+    !:
         rts
     !:
         cmp #MATERIAL_HURT
