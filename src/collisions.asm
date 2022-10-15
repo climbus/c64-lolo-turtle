@@ -100,6 +100,22 @@ COLLISIONS: {
         // a - material number
         rts
     }
+    
+    PlayerBoundaries: {
+        lda PLAYER.playerY
+        cmp #$c0
+        bcc !+
+        lda #$c0
+        sta PLAYER.playerY
+        jmp !++
+    !:
+        cmp #$4f
+        bcs !+
+        lda #$4f
+        sta PLAYER.playerY
+    !:
+        rts
+    }
 
     ActFrontCollisions: {
         lda front_material

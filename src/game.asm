@@ -69,6 +69,7 @@ GAME: {
         jsr CONTROLS.ReadJoy
         jsr COLLISIONS.CheckCollisions
         jsr COLLISIONS.ActFrontCollisions
+        jsr COLLISIONS.PlayerBoundaries
         
         jsr PLAYER.AnimateTurtle
         jsr HidePoints

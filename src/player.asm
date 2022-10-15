@@ -91,6 +91,19 @@ PLAYER: {
         rts
     }
 
+    MoveUp: {
+        dec playerY
+        lda playerY
+        sta VIC.SPRITE_0_Y
+        rts
+    }
+
+    MoveDown: {
+        inc playerY
+        lda playerY
+        sta VIC.SPRITE_0_Y
+        rts
+    }
     Hide: {
         lda VIC.ENABLE_SPRITE_REGISTER
         and #%11111110
