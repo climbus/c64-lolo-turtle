@@ -139,8 +139,11 @@ COLLISIONS: {
         rts
     !:
         cmp #MATERIAL_HURT
+        bne !++
+        lda PLAYER.immCount
         bne !+
         jsr PLAYER.ApplyDamage
+    !:
         rts
     !:
         cmp #$01

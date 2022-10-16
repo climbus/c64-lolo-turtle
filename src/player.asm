@@ -4,6 +4,8 @@
 PLAYER: {
     .const PLAYER_START_X = $aa
     .const PLAYER_START_Y = $b0
+    .const IMMORTALITY_TIME = $0f
+
     .label playerScreenPosition = $15
     .label platerLastPosition = $17
     
@@ -11,6 +13,7 @@ PLAYER: {
     playerX:    .byte PLAYER_START_X
     playerY:    .byte PLAYER_START_Y
     onDamage:   .byte $00
+    immCount:   .byte $00
     
     Init: {
     // point sprites
@@ -55,8 +58,12 @@ PLAYER: {
         sta VIC.SPRITE_1_Y
         rts
     }
-    
+   
     ApplyDamage: {
+        lda #IMMORTALITY_TIME
+        sta immCount
+        dec GAME.energy
+
         lda #01
         sta onDamage
         lda #01
@@ -65,6 +72,11 @@ PLAYER: {
     }
 
     ClearDamage: {
+        dec immCount
+        bpl !+
+        lda #$00
+        sta immCount
+    !:
         lda #00
         sta onDamage
         rts
@@ -109,6 +121,14 @@ PLAYER: {
         sta VIC.SPRITE_0_Y
         rts
     }
+    
+    ShowToogle: {
+        lda VIC.ENABLE_SPRITE_REGISTER
+        eor #%00000001
+        sta VIC.ENABLE_SPRITE_REGISTER
+        rts
+    }
+
     Hide: {
         lda VIC.ENABLE_SPRITE_REGISTER
         and #%11111110
@@ -118,7 +138,7 @@ PLAYER: {
 
     Show: {
         lda VIC.ENABLE_SPRITE_REGISTER
-        and #%11111111
+        ora #%00000001
         sta VIC.ENABLE_SPRITE_REGISTER
         rts
     }
@@ -127,12 +147,13 @@ PLAYER: {
         ldy sframe
         dey
         bne !+++
-        lda onDamage
-        bne !+
-        jsr Show
+        lda immCount
+        beq !+
+        .break
+        jsr ShowToogle
         jmp !++
     !:
-        jsr Hide
+        jsr Show
     !:
         ldy #04
         ldx VIC.SCREEN_RAM + $3f8
@@ -143,6 +164,20 @@ PLAYER: {
         ldx #$80
         stx VIC.SCREEN_RAM + $3f8
     !:  sty sframe
+        rts
+    }
+
+    Die: {
+        dec GAME.lives
+        bpl !+
+        lda #$00
+        sta GAME.lives
+        rts
+    !:
+        lda #IMMORTALITY_TIME
+        sta immCount
+        lda #GAME.MAX_ENERGY
+        sta GAME.energy
         rts
     }
 }

@@ -7,10 +7,13 @@
 
 
 GAME: {
+    .label MAX_ENERGY = $08
+    .label MAX_LIVES = $02
 
     showPointsCounter: .byte 00
     points: .byte 00, 00, 00, 00
     energy: .byte $0f
+    lives: .byte 00
 
     Init: {
 
@@ -57,8 +60,10 @@ GAME: {
         jsr PLAYER.Init
         
         cli
-        lda #$08
+        lda #MAX_ENERGY
         sta energy
+        lda #MAX_LIVES
+        sta lives
         rts
     }
 
@@ -81,20 +86,18 @@ GAME: {
         dec energy
     !:
 
-        lda PLAYER.onDamage
-        beq !+
-        lda COUNTER
-        and #$07
-        bne !+
-        dec energy
-    !:
-
         jsr HUD.ShowPoints
         jsr HUD.ShowEnergy
-        
-        lda energy
+        jsr HUD.ShowLives
+       
+        lda lives
         bne !+
         jsr Restart
+    !:
+
+        lda energy
+        bne !+
+        jsr PLAYER.Die
     !:
         jmp MainLoop
     

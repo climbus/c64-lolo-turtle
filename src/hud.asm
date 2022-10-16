@@ -6,6 +6,8 @@ HUD: {
     .const DIGITS_START_CHAR = $9a
     .const ENERGY_START_ADDR = $387
     .const HEART_CHAR = $b0
+    .const LIVES_START_ADDR = $393
+    .const LIVES_CHAR = $b1
 
     decPoints: .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
     hexPoints: .byte 00, 00, 00, 00
@@ -101,6 +103,23 @@ HUD: {
     !:
         sta VIC.COLOR_RAM + ENERGY_START_ADDR,y
         iny
+        dex
+        bpl !Loop-
+        rts
+    }
+
+    ShowLives: {
+        ldx #GAME.MAX_LIVES
+        ldy #$00
+    !Loop:
+        lda #LIVES_CHAR
+        cpx GAME.lives
+        bcc !+
+        lda #$00
+    !:
+        sta VIC.SCREEN_RAM + LIVES_START_ADDR,y
+        sta VIC.SCREEN_RAM2 + LIVES_START_ADDR,y
+        iny 
         dex
         bpl !Loop-
         rts
