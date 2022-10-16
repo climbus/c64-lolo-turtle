@@ -7,7 +7,6 @@ PLAYER: {
     .const IMMORTALITY_TIME = $0f
 
     .label playerScreenPosition = $15
-    .label platerLastPosition = $17
     
     sframe:     .byte 04
     playerX:    .byte PLAYER_START_X, 00
@@ -92,7 +91,6 @@ PLAYER: {
 
     MoveLeft: {
         lda playerX
-        sta platerLastPosition
         sec
         sbc #$01
         sta playerX
@@ -109,7 +107,6 @@ PLAYER: {
 
     MoveRight: {
         lda playerX
-        sta platerLastPosition
         clc
         adc #$01
         sta playerX
