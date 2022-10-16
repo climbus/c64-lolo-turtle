@@ -20,6 +20,8 @@ VIC: {
     .label SPRITE_0_Y = $d001
     .label SPRITE_1_X = $d002
     .label SPRITE_1_Y = $d003
+
+    .label SPRITE_8_BIT = $d010
     
     .label temp = $13
 

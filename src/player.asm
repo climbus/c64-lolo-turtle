@@ -10,7 +10,7 @@ PLAYER: {
     .label platerLastPosition = $17
     
     sframe:     .byte 04
-    playerX:    .byte PLAYER_START_X
+    playerX:    .byte PLAYER_START_X, 00
     playerY:    .byte PLAYER_START_Y
     onDamage:   .byte $00
     immCount:   .byte $00
@@ -93,18 +93,35 @@ PLAYER: {
     MoveLeft: {
         lda playerX
         sta platerLastPosition
-        dec playerX
-        lda playerX
+        sec
+        sbc #$01
+        sta playerX
         sta VIC.SPRITE_0_X
+        lda playerX + 1
+        sbc #$00
+        sta playerX + 1
+        bne !+
+        lda #%00000000
+        sta VIC.SPRITE_8_BIT
+    !:
         rts
     }
 
     MoveRight: {
         lda playerX
         sta platerLastPosition
-        inc playerX
-        lda playerX
+        clc
+        adc #$01
+        sta playerX
         sta VIC.SPRITE_0_X
+        lda playerX + 1
+        adc #$00
+        sta playerX + 1
+        cmp #$01
+        bne !+
+        lda #%00000001
+        sta VIC.SPRITE_8_BIT
+    !:
         rts
     }
 
