@@ -150,6 +150,11 @@ COLLISIONS: {
         bne !+
         jsr PLAYER.GoBack
     !:
+        lda front_material
+        cmp #$0f
+        bne !+
+        jsr GAME.Restart     
+    !:
         jsr PLAYER.ClearDamage
         rts
     }

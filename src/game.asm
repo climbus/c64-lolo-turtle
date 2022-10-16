@@ -8,7 +8,7 @@
 
 GAME: {
     .label MAX_ENERGY = $08
-    .label MAX_LIVES = $02
+    .label MAX_LIVES = $03
 
     showPointsCounter: .byte 00
     points: .byte 00, 00, 00, 00
