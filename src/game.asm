@@ -145,6 +145,7 @@ GAME: {
 
     ShowPoints: {
         lda PLAYER.playerX
+        asl
         adc #20
         sta VIC.SPRITE_1_X
         lda PLAYER.playerY

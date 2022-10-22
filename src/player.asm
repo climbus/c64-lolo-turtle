@@ -2,7 +2,7 @@
 #import "vic.asm"
 
 PLAYER: {
-    .const PLAYER_START_X = $aa
+    .const PLAYER_START_X = $50
     .const PLAYER_START_Y = $b0
     .const IMMORTALITY_TIME = $0f
 
@@ -94,14 +94,6 @@ PLAYER: {
         sec
         sbc #$01
         sta playerX
-        sta VIC.SPRITE_0_X
-        lda playerX + 1
-        sbc #$00
-        sta playerX + 1
-        bne !+
-        lda #%00000000
-        sta VIC.SPRITE_8_BIT
-    !:
         rts
     }
 
@@ -110,15 +102,6 @@ PLAYER: {
         clc
         adc #$01
         sta playerX
-        sta VIC.SPRITE_0_X
-        lda playerX + 1
-        adc #$00
-        sta playerX + 1
-        cmp #$01
-        bne !+
-        lda #%00000001
-        sta VIC.SPRITE_8_BIT
-    !:
         rts
     }
 
@@ -158,12 +141,24 @@ PLAYER: {
     }
 
     AnimateTurtle: {
+        lda playerX
+        asl
+        sta VIC.SPRITE_0_X
+        bcc !+
+        lda VIC.SPRITE_8_BIT
+        ora #%00000001
+        jmp !++
+    !:
+        lda VIC.SPRITE_8_BIT
+        and #%11111110
+    !:
+        sta VIC.SPRITE_8_BIT
+
         ldy sframe
         dey
         bne !+++
         lda immCount
         beq !+
-        .break
         jsr ShowToogle
         jmp !++
     !:

@@ -28,7 +28,6 @@ COLLISIONS: {
         sbc OFFSET_X
         lsr
         lsr
-        lsr
         tax
 
         // x - row number
@@ -41,7 +40,7 @@ COLLISIONS: {
         .label ROW = TMP2
         .label COL = TMP3
         
-        ldx #12
+        ldx #06
         ldy #43
         jsr GetCharPosition
         
@@ -51,15 +50,15 @@ COLLISIONS: {
         sty front_col
 
         jsr GetCharacterAt
-        //PrintDebugChar()
         
         jsr GetMaterial
         sta front_material
 
-        ldx #26
+        ldx #12
         ldy #43
         jsr GetCharPosition
         jsr GetCharacterAt
+        //PrintDebugChar()
 
         jsr GetMaterial
         sta left_material
