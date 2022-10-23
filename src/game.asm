@@ -105,16 +105,8 @@ GAME: {
     }
 
     Restart: {
-        sei
-        ldy #$7f      // 01111111 
-        sty $dc0d     // turn off CIA timer interrupt
-        lda $dc0d     // cancel any pending IRQs
-        lda #$00
-        sta $d01a     // enable VIC-II Raster Beam IRQ
-        lda #$ff
-        sta $fffe
-        sta $ffff
-        
+        jsr IRQ.ScrollStop
+
         lda #$00
         sta points
         sta points + 1

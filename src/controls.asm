@@ -57,4 +57,10 @@ CONTROLS: {
         bne !-
         rts
     }
+
+    CheckFire: {
+        lda JOY_PORT_2
+        and #$10 
+        rts
+    }
 }
