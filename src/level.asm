@@ -223,17 +223,30 @@ LEVEL: {
     }
 
     SetTailAt: {
+        .label ROW = TMP2
+        .label COL = TMP3
         txa
         lsr
         asl
         tax
+        lda Screen.screen_buffer_nbr
+        beq !+
+        iny
+    !:    
         tya
         lsr
         asl
         tay
-        
+        lda Screen.screen_buffer_nbr
+        beq !+
+        dey
+    !:    
+        stx ROW
+        sty COL
         LoadScreenMSB()
         jsr SetTail
+        ldx ROW
+        ldy COL
         LoadBufferMSB()
         jsr SetTail
         rts
@@ -248,13 +261,7 @@ LEVEL: {
         txa
         tay
         jsr SetTileLine
-        lda Screen.screen_buffer_nbr
-        bne !+
         add16im(SCREEN_POS, 40, SCREEN_POS)
-        jmp !++
-    !:
-        sub16im(SCREEN_POS, 40, SCREEN_POS)
-    !:
 
         dey
         jsr SetTileLine
