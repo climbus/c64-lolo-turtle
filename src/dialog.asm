@@ -141,42 +141,10 @@ DIALOG: {
         sta textLen
 
         jsr ShowText
-        
-        dec textLen
-        dec textLen
-
-        lda #<[VIC.COLOR_RAM + 40 * [DEFAULT_ROW + 2] + DEFAULT_COL + 2]
-        sta colorPtr
-        lda #>[VIC.COLOR_RAM + 40 * [DEFAULT_ROW + 2] + DEFAULT_COL + 2]
-        sta colorPtr + 1
-
-        ldx #$00
-    !:
-        //jsr FadeColors
-        jsr CONTROLS.CheckFire
-        bne !-
-        
-    }
-
-    FadeColors: {
-
-        ldy #$00
-    !:     
-        lda (fade),x
-        .break
-        sta (colorPtr),y
-        iny
-        cpy textLen
-        bne !-
-        inx
-        cpx #26
-        bne !+
-        ldx #$00
-    !:
+        jsr CONTROLS.WaitForFire        
         rts
     }
 
-    fade: .byte $01, $01, $07, $07, $03, $03, $03, $03, $04, $04, $02, $02, $02, $00, $00, $00, $00, $02, $02, $02, $04, $04, $04, $03, $03, $03, $03 
     textGetReady: .text "GET READY"
     endTextGetReady: .byte $ff
 }
