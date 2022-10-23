@@ -8,12 +8,16 @@ BasicUpstart2(Start)
 #import "game.asm"
 #import "screen.asm"
 #import "hud.asm"
+#import "dialog.asm"
 
 Start:
     jsr GAME.Init
     jsr Screen.Init
     jsr LEVEL.DrawScreen
     jsr HUD.Draw
+
+    jsr DIALOG.ShowGetReady
+
     jsr IRQ.Setup
     lda #$00
     sta COUNTER
