@@ -146,8 +146,28 @@ GAME: {
     ShowPoints: {
         lda PLAYER.playerX
         asl
+        sta VIC.SPRITE_1_X
+        bcc !+
+        sec
+        sbc #20
+        sta VIC.SPRITE_1_X
+        lda VIC.SPRITE_8_BIT
+        ora #%00000010
+        jmp !+++
+    !:
+        clc
         adc #20
         sta VIC.SPRITE_1_X
+        bcc !+
+        lda VIC.SPRITE_8_BIT
+        ora #%00000010
+        jmp !++
+    !:
+        lda VIC.SPRITE_8_BIT
+        and #%11111101
+    !:
+        sta VIC.SPRITE_8_BIT
+
         lda PLAYER.playerY
         sbc #15
         sta VIC.SPRITE_1_Y
