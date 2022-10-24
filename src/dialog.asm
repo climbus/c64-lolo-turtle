@@ -121,6 +121,24 @@ DIALOG: {
         rts
     }
 
+    HideText: {
+        ldx #$05
+    !:
+        ldy textLen
+        iny
+        iny
+    !:
+        dey
+        lda #$00
+        sta (screenPtr),y
+        cpy #$00
+        bne !-
+        sub16im(screenPtr, 40, screenPtr)
+        dex
+        bne !--
+        rts
+    }
+
     ShowGetReady: {
         lda #<[VIC.SCREEN_RAM + 40 * DEFAULT_ROW + DEFAULT_COL]
         sta screenPtr
@@ -142,6 +160,7 @@ DIALOG: {
 
         jsr ShowText
         jsr CONTROLS.WaitForFire        
+        jsr HideText
         rts
     }
 
