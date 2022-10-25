@@ -10,10 +10,14 @@ GAME: {
     .label MAX_ENERGY = $08
     .label MAX_LIVES = $03
 
+    .label STATE_RUN = $01
+    .label STATE_PAUSE = $02
+
     showPointsCounter: .byte 00
     points: .byte 00, 00, 00, 00
     energy: .byte $0f
     lives: .byte 00
+    state: .byte 00
 
     Init: {
 

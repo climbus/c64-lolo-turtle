@@ -139,6 +139,40 @@ DIALOG: {
         rts
     }
 
+    ShowEatText: {
+        lda Screen.screen_buffer_nbr
+        beq !+
+        lda #<[VIC.SCREEN_RAM2 + 40 * DEFAULT_ROW + DEFAULT_COL]
+        sta screenPtr
+        lda #>[VIC.SCREEN_RAM2 + 40 * DEFAULT_ROW + DEFAULT_COL]
+        sta screenPtr + 1
+        jmp !++
+    !:
+        lda #<[VIC.SCREEN_RAM + 40 * DEFAULT_ROW + DEFAULT_COL]
+        sta screenPtr
+        lda #>[VIC.SCREEN_RAM + 40 * DEFAULT_ROW + DEFAULT_COL]
+        sta screenPtr + 1
+    !:
+        lda #<[VIC.COLOR_RAM + 40 * DEFAULT_ROW + DEFAULT_COL]
+        sta colorPtr
+        lda #>[VIC.COLOR_RAM + 40 * DEFAULT_ROW + DEFAULT_COL]
+        sta colorPtr + 1
+       
+        lda #<textEat - 2
+        sta textLSB
+        lda #>textEat - 2 
+        sta textMSB
+
+        lda #[endTextEat - textEat + 2]
+        sta textLen
+
+        jsr ShowText
+        jsr CONTROLS.WaitForFire        
+        jsr HideText
+        rts
+
+    }
+
     ShowGetReady: {
         lda #<[VIC.SCREEN_RAM + 40 * DEFAULT_ROW + DEFAULT_COL]
         sta screenPtr
@@ -164,8 +198,25 @@ DIALOG: {
         rts
     }
 
+    ShowNext: {
+    !:  // wait for stable scroll
+        lda Screen.vscroll
+        cmp #$06
+        bne !-
+
+        lda #GAME.STATE_PAUSE
+        sta GAME.state
+        jsr ShowEatText 
+        lda #GAME.STATE_RUN
+        sta GAME.state
+        rts
+    }
+
     textGetReady: .text "GET READY"
     endTextGetReady: .byte $ff
+
+    textEat: .text "MUSISZ JESC"
+    endTextEat: .byte $ff
 }
 
 .macro SPACE_LINE() {

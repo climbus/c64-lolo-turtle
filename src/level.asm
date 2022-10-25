@@ -9,10 +9,10 @@ LEVEL: {
     
     rowsCount: .byte $0b
     currentTileRow: .byte 2
+    tmpTile: .byte 00, 00
 
     DrawNextRow: {   
         .label COL = TMP4
-        .label TMP_TILE = TMP5
 
         set16(Screen.screen_base, Scr + 1)
         lda #<VIC.COLOR_RAM
@@ -25,12 +25,12 @@ LEVEL: {
         lda currentTileRow
         cmp #$00
         bne !+
-        set16(TMP_TILE, Tile +1)    
+        set16(tmpTile, Tile +1)    
     !:
         lda currentTileRow
         cmp #02
         bne !+
-        set16(Tile + 1, TMP_TILE)
+        set16(Tile + 1, tmpTile)
     !:
         lda #$00
         sta COL

@@ -4,6 +4,7 @@ COLLISIONS: {
 
     front_material: .byte 00
     left_material: .byte 00
+    last_material: .byte 00
     right_material: .byte 00
     front_row: .byte 00
     front_col: .byte 00
@@ -118,6 +119,11 @@ COLLISIONS: {
 
     ActFrontCollisions: {
         lda front_material
+        cmp last_material
+        bne !+
+        sta last_material
+        rts
+    !:
         cmp #MATERIAL_SOLID
         bne !++
         ldx front_row
@@ -155,6 +161,12 @@ COLLISIONS: {
         jsr GAME.Restart     
     !:
         jsr PLAYER.ClearDamage
+
+        lda front_material
+        cmp #$08
+        bne !+
+        jsr DIALOG.ShowNext 
+    !:
         rts
     }
 }

@@ -37,12 +37,16 @@ IRQ: {
 
     IRQMiddle: {
         IRQStart()
+        lda GAME.state
+        cmp #GAME.STATE_PAUSE
+        beq !End+
         
         lda Screen.vscroll                                  
         cmp #7
         bne !+          
         jsr Screen.ColorShiftUpper
     !:
+    !End:
         jmp HandlerFooter
     }
 
@@ -83,7 +87,13 @@ IRQ: {
         IRQStart()
         EnableMulticolorMode()
 
+        lda GAME.state
+        cmp #GAME.STATE_PAUSE
+        beq !+
         jsr Screen.ShiftBottom
+    !:
+        lda #$08
+        sta VIC.BACKGROUND_COLOR
         lda Screen.vscroll
         cmp #07
         bne !+
