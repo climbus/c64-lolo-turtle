@@ -1,6 +1,7 @@
 DIALOG: {
     .const DEFAULT_ROW = 8
     .const DEFAULT_COL = 12
+    .const DEFAULT_TEXT_LEN = 14
     
     .label FRAME_UL = $9a
     .label FRAME_DL = $9f
@@ -74,12 +75,12 @@ DIALOG: {
         jsr DrawChar
         cpx #$cd
         bne !+
-        add16im(textPtr, 13, textPtr)
+        add16im(textPtr, DEFAULT_TEXT_LEN - 1, textPtr)
         add16im(screenPtr, 40, screenPtr)
         add16im(colorPtr, 40, colorPtr)
         jmp !TextLine-
     !:
-        add16im(textPtr, 13, textPtr)
+        add16im(textPtr, DEFAULT_TEXT_LEN - 1, textPtr)
         jsr SpaceLine
 
         add16im(screenPtr, 40, screenPtr)
@@ -141,20 +142,6 @@ DIALOG: {
         rts
     }
 
-    ShowEatText: {
-        set16(currentText, textPtr)
-
-        lda #14
-        sta textLen
-
-        jsr ShowText
-        jsr CONTROLS.WaitForFire        
-        jsr HideText
-        set16(textPtr, currentText)
-        rts
-
-    }
-
     SpaceLine: {
         add16im(screenPtr, 40, screenPtr)
         add16im(colorPtr, 40, colorPtr)
@@ -182,13 +169,13 @@ DIALOG: {
         lda #>textGetReady - 2 
         sta textPtr + 1
 
-        lda #14
+        lda #DEFAULT_TEXT_LEN
         sta textLen
 
         jsr ShowText
         jsr CONTROLS.WaitForFire        
         jsr HideText
-        .break
+
         set16(textPtr, currentText)
         rts
     }
@@ -200,16 +187,23 @@ DIALOG: {
         bne !-
         lda #GAME.STATE_PAUSE
         sta GAME.state
-        jsr ShowEatText 
+
+        set16(currentText, textPtr)
+        lda #DEFAULT_TEXT_LEN
+        sta textLen
+        jsr ShowText
+        jsr CONTROLS.WaitForFire        
+        jsr HideText
+        set16(textPtr, currentText)
+
         lda #GAME.STATE_RUN
         sta GAME.state
         rts
     }
 
     textGetReady: .text @" GET READY  \$ff"
-
     textEat: .text @"MUSISZ JESC \n  ABY MIEC  \n    SILE    \$ff"
-
     textWater: .text @"   UWAZAJ   \n   NA WODE  \$ff"
+    textLevelComplete: .text @"   POZIOM   \n UKONCZONY  \$ff"
 }
 
