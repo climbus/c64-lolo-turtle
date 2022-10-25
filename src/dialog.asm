@@ -12,121 +12,93 @@ DIALOG: {
     .label FRAME_R = $9e
     .label DIALOG_COLOR = $01
 
-    .label textLSB = TMP2 
-    .label textMSB = TMP3
+    .label textPtr = TMP2 
     .label screenPtr = TMP4
     .label colorPtr = TMP6
     .label textPos = $00
     
     textLen: .byte $00
+    currentText: .word $0000
+
+    DrawChar: {
+        sta (screenPtr),y
+        lda #DIALOG_COLOR
+        sta (colorPtr),y
+        iny
+        rts
+    }
 
     ShowText: {
+        jsr SetDialogStart
+
         ldy #$00
         lda #FRAME_UL
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
-        iny
+        jsr DrawChar
         lda #FRAME_U
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
-        iny
+        jsr DrawChar
     !:
         lda #FRAME_U
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
-        iny
+        jsr DrawChar
         cpy textLen
         bne !-
         lda #FRAME_U
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
-        iny
+        jsr DrawChar
         lda #FRAME_UR
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
+        jsr DrawChar
 
-        SPACE_LINE()
+        jsr SpaceLine
     
         add16im(screenPtr, 40, screenPtr)
         add16im(colorPtr, 40, colorPtr)
     !TextLine:
         ldy #$00
         lda #FRAME_L
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
-        iny
+        jsr DrawChar
         lda #$00
-        sta (screenPtr),y
-        iny
+        jsr DrawChar
     !:
-        lda (textLSB),y
+        lda (textPtr),y
         cmp #$ff
         beq !+
         cmp #$cd
         beq !+
         clc
         adc #$33
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
-        iny
+        jsr DrawChar
         jmp !-
     !:
         tax
         lda #$00
-        sta (screenPtr),y
-        iny
+        jsr DrawChar
         lda #FRAME_R
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
+        jsr DrawChar
         cpx #$cd
         bne !+
-        add16im(textLSB, 13, textLSB)
+        add16im(textPtr, 13, textPtr)
         add16im(screenPtr, 40, screenPtr)
         add16im(colorPtr, 40, colorPtr)
         jmp !TextLine-
     !:
-        SPACE_LINE()
+        add16im(textPtr, 13, textPtr)
+        jsr SpaceLine
 
         add16im(screenPtr, 40, screenPtr)
         add16im(colorPtr, 40, colorPtr)
 
         ldy #$00
         lda #FRAME_DL
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
-        iny
+        jsr DrawChar
         lda #FRAME_D
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
-        iny
+        jsr DrawChar
     !:
         lda #FRAME_D
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
-        iny
+        jsr DrawChar
         cpy textLen
         bne !-
         lda #FRAME_D
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
-        iny
+        jsr DrawChar
         lda #FRAME_DR
-        sta (screenPtr),y
-        lda #DIALOG_COLOR
-        sta (colorPtr),y
-
+        jsr DrawChar
         rts
     }
 
@@ -147,8 +119,8 @@ DIALOG: {
         bne !--
         rts
     }
-
-    ShowEatText: {
+    
+    SetDialogStart: {
         lda Screen.screen_buffer_nbr
         beq !+
         lda #<[VIC.SCREEN_RAM2 + 40 * DEFAULT_ROW + DEFAULT_COL]
@@ -166,11 +138,11 @@ DIALOG: {
         sta colorPtr
         lda #>[VIC.COLOR_RAM + 40 * DEFAULT_ROW + DEFAULT_COL]
         sta colorPtr + 1
-       
-        lda #<textEat - 2
-        sta textLSB
-        lda #>textEat - 2 
-        sta textMSB
+        rts
+    }
+
+    ShowEatText: {
+        set16(currentText, textPtr)
 
         lda #14
         sta textLen
@@ -178,32 +150,46 @@ DIALOG: {
         jsr ShowText
         jsr CONTROLS.WaitForFire        
         jsr HideText
+        set16(textPtr, currentText)
         rts
 
     }
 
+    SpaceLine: {
+        add16im(screenPtr, 40, screenPtr)
+        add16im(colorPtr, 40, colorPtr)
+
+        ldy #$00
+        lda #FRAME_L
+        jsr DrawChar
+
+        lda #$00
+        jsr DrawChar
+    !:
+        lda #$00
+        jsr DrawChar
+        cpy DIALOG.textLen
+        bne !-
+        lda #$00
+        jsr DrawChar
+        lda #FRAME_R
+        jsr DrawChar
+        rts
+}
     ShowGetReady: {
-        lda #<[VIC.SCREEN_RAM + 40 * DEFAULT_ROW + DEFAULT_COL]
-        sta screenPtr
-        lda #>[VIC.SCREEN_RAM + 40 * DEFAULT_ROW + DEFAULT_COL]
-        sta screenPtr + 1
-
-        lda #<[VIC.COLOR_RAM + 40 * DEFAULT_ROW + DEFAULT_COL]
-        sta colorPtr
-        lda #>[VIC.COLOR_RAM + 40 * DEFAULT_ROW + DEFAULT_COL]
-        sta colorPtr + 1
-       
         lda #<textGetReady - 2
-        sta textLSB
+        sta textPtr
         lda #>textGetReady - 2 
-        sta textMSB
+        sta textPtr + 1
 
-        lda #[endTextGetReady - textGetReady + 2]
+        lda #14
         sta textLen
 
         jsr ShowText
         jsr CONTROLS.WaitForFire        
         jsr HideText
+        .break
+        set16(textPtr, currentText)
         rts
     }
 
@@ -220,46 +206,10 @@ DIALOG: {
         rts
     }
 
-    textGetReady: .text "  GET READY  "
-    endTextGetReady: .byte $ff
+    textGetReady: .text @" GET READY  \$ff"
 
-    textEat: .text @"MUSISZ JESC \n  ABY MIEC  \n    SILE    "
-    endTextEat: .byte $ff
+    textEat: .text @"MUSISZ JESC \n  ABY MIEC  \n    SILE    \$ff"
 
-    textWater: .text @"UWAZAJ NA WODE"
-    endTextWater: .byte $ff
+    textWater: .text @"   UWAZAJ   \n   NA WODE  \$ff"
 }
 
-.macro SPACE_LINE() {
-        add16im(DIALOG.screenPtr, 40, DIALOG.screenPtr)
-        add16im(DIALOG.colorPtr, 40, DIALOG.colorPtr)
-
-        ldy #$00
-        lda #DIALOG.FRAME_L
-        sta (DIALOG.screenPtr),y
-        lda #DIALOG.DIALOG_COLOR
-        sta (DIALOG.colorPtr),y
-        iny
-        lda #$00
-        sta (DIALOG.screenPtr),y
-        lda #DIALOG.DIALOG_COLOR
-        sta (DIALOG.colorPtr),y
-        iny
-    !:
-        lda #$00
-        sta (DIALOG.screenPtr),y
-        lda #DIALOG.DIALOG_COLOR
-        sta (DIALOG.colorPtr),y
-        iny
-        cpy DIALOG.textLen
-        bne !-
-        lda #$00
-        sta (DIALOG.screenPtr),y
-        lda #DIALOG.DIALOG_COLOR
-        sta (DIALOG.colorPtr),y
-        iny
-        lda #DIALOG.FRAME_R
-        sta (DIALOG.screenPtr),y
-        lda #DIALOG.DIALOG_COLOR
-        sta (DIALOG.colorPtr),y
-}
