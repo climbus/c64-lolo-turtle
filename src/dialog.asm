@@ -1,6 +1,6 @@
 DIALOG: {
     .const DEFAULT_ROW = 8
-    .const DEFAULT_COL = 13
+    .const DEFAULT_COL = 12
     
     .label FRAME_UL = $9a
     .label FRAME_DL = $9f
@@ -54,7 +54,7 @@ DIALOG: {
     
         add16im(screenPtr, 40, screenPtr)
         add16im(colorPtr, 40, colorPtr)
-        
+    !TextLine:
         ldy #$00
         lda #FRAME_L
         sta (screenPtr),y
@@ -68,6 +68,8 @@ DIALOG: {
         lda (textLSB),y
         cmp #$ff
         beq !+
+        cmp #$cd
+        beq !+
         clc
         adc #$33
         sta (screenPtr),y
@@ -76,6 +78,7 @@ DIALOG: {
         iny
         jmp !-
     !:
+        tax
         lda #$00
         sta (screenPtr),y
         iny
@@ -83,9 +86,15 @@ DIALOG: {
         sta (screenPtr),y
         lda #DIALOG_COLOR
         sta (colorPtr),y
-
+        cpx #$cd
+        bne !+
+        add16im(textLSB, 13, textLSB)
+        add16im(screenPtr, 40, screenPtr)
+        add16im(colorPtr, 40, colorPtr)
+        jmp !TextLine-
+    !:
         SPACE_LINE()
-    
+
         add16im(screenPtr, 40, screenPtr)
         add16im(colorPtr, 40, colorPtr)
 
@@ -163,7 +172,7 @@ DIALOG: {
         lda #>textEat - 2 
         sta textMSB
 
-        lda #[endTextEat - textEat + 2]
+        lda #14
         sta textLen
 
         jsr ShowText
@@ -203,7 +212,6 @@ DIALOG: {
         lda Screen.vscroll
         cmp #$06
         bne !-
-
         lda #GAME.STATE_PAUSE
         sta GAME.state
         jsr ShowEatText 
@@ -212,11 +220,14 @@ DIALOG: {
         rts
     }
 
-    textGetReady: .text "GET READY"
+    textGetReady: .text "  GET READY  "
     endTextGetReady: .byte $ff
 
-    textEat: .text "MUSISZ JESC"
+    textEat: .text @"MUSISZ JESC \n  ABY MIEC  \n    SILE    "
     endTextEat: .byte $ff
+
+    textWater: .text @"UWAZAJ NA WODE"
+    endTextWater: .byte $ff
 }
 
 .macro SPACE_LINE() {
