@@ -15,6 +15,7 @@ Start:
     jsr Screen.Init
     jsr LEVEL.DrawScreen
     jsr HUD.Draw
+    jsr PLAYER.Init
 
     jsr DIALOG.ShowGetReady
 

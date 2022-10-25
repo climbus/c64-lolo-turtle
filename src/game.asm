@@ -60,14 +60,15 @@ GAME: {
         // setup character memory and screen memory
         lda #%00001100
         sta $d018
-
-        jsr PLAYER.Init
-        
+ 
         cli
         lda #MAX_ENERGY
         sta energy
         lda #MAX_LIVES
         sta lives
+
+        lda #STATE_RUN
+        sta state
         rts
     }
 

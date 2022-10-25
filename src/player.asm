@@ -46,6 +46,7 @@ PLAYER: {
         
         lda #PLAYER_START_X
         sta playerX
+        asl
         sta VIC.SPRITE_0_X
 
         lda #PLAYER_START_Y
