@@ -91,6 +91,11 @@ GAME: {
         dec energy
     !:
 
+        lda COUNTER
+        and #$03
+        bne !+
+        jsr PLAYER.ClearDamage
+    !:
         jsr HUD.ShowPoints
         jsr HUD.ShowEnergy
         jsr HUD.ShowLives

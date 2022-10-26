@@ -187,7 +187,7 @@ DIALOG: {
         bne !-
         lda #GAME.STATE_PAUSE
         sta GAME.state
-
+        
         set16(currentText, textPtr)
         lda #DEFAULT_TEXT_LEN
         sta textLen

@@ -124,6 +124,7 @@ COLLISIONS: {
         sta last_material
         rts
     !:
+        sta last_material
         cmp #MATERIAL_SOLID
         bne !++
         ldx front_row
