@@ -1,5 +1,5 @@
 DIALOG: {
-    .const DEFAULT_ROW = 8
+    .const DEFAULT_ROW = 4
     .const DEFAULT_COL = 12
     .const DEFAULT_TEXT_LEN = 14
     
