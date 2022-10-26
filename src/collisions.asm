@@ -159,6 +159,7 @@ COLLISIONS: {
         lda front_material
         cmp #$0f
         bne !+
+        jsr DIALOG.ShowNext
         jsr GAME.Restart     
     !:
         jsr PLAYER.ClearDamage
