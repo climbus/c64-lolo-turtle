@@ -15,7 +15,9 @@ DIALOG: {
 
     .label textPtr = TMP2 
     .label screenPtr = TMP4
+    .label bufferPtr = TMP8
     .label colorPtr = TMP6
+    .label colorTMPPtr = TMP10
     .label textPos = $00
     
     textLen: .byte $00
@@ -23,6 +25,10 @@ DIALOG: {
 
     DrawChar: {
         sta (screenPtr),y
+        
+        lda (colorPtr),y
+        sta (colorTMPPtr),y
+
         lda #DIALOG_COLOR
         sta (colorPtr),y
         iny
@@ -31,7 +37,11 @@ DIALOG: {
 
     ShowText: {
         jsr SetDialogStart
-
+        
+        lda #<colorTMP
+        sta colorTMPPtr
+        lda #>colorTMP
+        sta colorTMPPtr + 1
         ldy #$00
         lda #FRAME_UL
         jsr DrawChar
@@ -104,20 +114,52 @@ DIALOG: {
     }
 
     HideText: {
-        ldx #$05
+        jsr SetDialogStart
+        inc textLen
+        inc textLen
+        lda screenPtr
+        sta bufferPtr
+
+        lda Screen.screen_buffer_nbr
+        bne !+
+        lda screenPtr + 1
+        clc
+        adc #$04
+        jmp !++
     !:
-        ldy textLen
-        iny
-        iny
+        lda screenPtr + 1
+        sec
+        sbc #$04
     !:
-        dey
-        lda #$00
+        sta bufferPtr + 1
+        add16im(bufferPtr, 40, bufferPtr)
+
+        ldx #$00
+    !:
+        txa
+        pha
+        ldy #$00
+    !:
+        lda (bufferPtr),y
         sta (screenPtr),y
-        cpy #$00
+        tax
+        lda Colors,x
+        sta (colorPtr),y
+
+        iny
+        cpy textLen
         bne !-
-        sub16im(screenPtr, 40, screenPtr)
-        dex
+        
+        pla
+        tax
+        add16im(screenPtr, 40, screenPtr)
+        add16im(bufferPtr, 40, bufferPtr)
+        add16im(colorPtr, 40, colorPtr)
+
+        inx
+        cpx #$06
         bne !--
+
         rts
     }
     
@@ -205,5 +247,7 @@ DIALOG: {
     textEat: .text @"MUSISZ JESC \n  ABY MIEC  \n    SILE    \$ff"
     textWater: .text @"   UWAZAJ   \n   NA WODE  \$ff"
     textLevelComplete: .text @"   POZIOM   \n UKONCZONY  \$ff"
+
+    colorTMP: .fill 12*10,0
 }
 
