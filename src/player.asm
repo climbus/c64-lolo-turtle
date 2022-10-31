@@ -2,7 +2,7 @@
 #import "vic.asm"
 
 PLAYER: {
-    .const PLAYER_START_X = $50
+    .const PLAYER_START_X = $55
     .const PLAYER_START_Y = $b0
     .const IMMORTALITY_TIME = $0f
 
@@ -157,7 +157,7 @@ PLAYER: {
 
         ldy sframe
         dey
-        bne !+++
+        bne !End+
         lda immCount
         beq !+
         jsr ShowToogle
@@ -169,11 +169,14 @@ PLAYER: {
         ldx VIC.SCREEN_RAM + $3f8
         inx
         stx VIC.SCREEN_RAM + $3f8
+        stx VIC.SCREEN_RAM2 + $3f8
         cpx #$83
-        bne !+
+        bne !End+
         ldx #$80
         stx VIC.SCREEN_RAM + $3f8
-    !:  sty sframe
+        stx VIC.SCREEN_RAM2 + $3f8
+    !End:  
+        sty sframe
         rts
     }
 
@@ -188,6 +191,30 @@ PLAYER: {
         sta immCount
         lda #GAME.MAX_ENERGY
         sta GAME.energy
+        rts
+    }
+
+    GoToEnd: {
+    !StartLoop:
+        ldy #$00
+        jsr VIC.WaitForFrame
+
+        inc COUNTER
+        lda COUNTER
+        and #%00000011
+        bne !EndLoop+
+        jsr AnimateTurtle
+        lda playerX
+        cmp #PLAYER_START_X
+        beq !SkipX+
+        bcc !+
+        jsr MoveLeft
+    !:
+        jsr MoveRight
+    !SkipX:
+        jsr MoveUp
+    !EndLoop:
+        bne !StartLoop-
         rts
     }
 }
