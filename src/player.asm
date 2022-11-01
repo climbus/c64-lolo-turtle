@@ -13,6 +13,7 @@ PLAYER: {
     playerY:    .byte PLAYER_START_Y
     onDamage:   .byte $00
     immCount:   .byte $00
+    onWall:     .byte $00
     
     Init: {
     // point sprites
@@ -87,6 +88,8 @@ PLAYER: {
         inc playerY
         lda playerY
         sta VIC.SPRITE_0_Y
+        lda #$01
+        sta onWall
         rts
     }
 
@@ -107,9 +110,12 @@ PLAYER: {
     }
 
     MoveUp: {
+        lda onWall
+        bne !+
         dec playerY
         lda playerY
         sta VIC.SPRITE_0_Y
+    !:
         rts
     }
 
@@ -154,6 +160,15 @@ PLAYER: {
         and #%11111110
     !:
         sta VIC.SPRITE_8_BIT
+
+        lda onWall
+        beq !+
+        inc playerY
+        inc playerY
+        inc playerY
+        lda playerY
+        sta VIC.SPRITE_0_Y
+    !:
 
         ldy sframe
         dey

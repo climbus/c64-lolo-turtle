@@ -152,6 +152,10 @@ COLLISIONS: {
     !:
         rts
     !:
+        lda #$00
+        sta PLAYER.onWall
+
+        lda front_material
         cmp #$01
         bne !+
         jsr PLAYER.GoBack
