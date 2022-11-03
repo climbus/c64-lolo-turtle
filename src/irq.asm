@@ -69,7 +69,7 @@ IRQ: {
 
         lda #00
         sta VIC.BACKGROUND_COLOR
-       
+
         DisableMulticolorMode()
 
         UpdateScrollRegisterNum(7)
@@ -94,6 +94,8 @@ IRQ: {
     !:
         lda #$08
         sta VIC.BACKGROUND_COLOR
+
+
         lda Screen.vscroll
         cmp #07
         bne !+

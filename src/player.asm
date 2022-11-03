@@ -14,6 +14,7 @@ PLAYER: {
     onDamage:   .byte $00
     immCount:   .byte $00
     onWall:     .byte $00
+    onDownLimit:.byte $00
     
     Init: {
     // point sprites
@@ -120,9 +121,12 @@ PLAYER: {
     }
 
     MoveDown: {
+        lda onDownLimit
+        bne !+
         inc playerY
         lda playerY
         sta VIC.SPRITE_0_Y
+    !:
         rts
     }
     
@@ -196,12 +200,47 @@ PLAYER: {
     }
 
     Die: {
+        lda #$84
+        sta VIC.SCREEN_RAM + $3f8
+        sta VIC.SCREEN_RAM2 + $3f8
+    !:
+        ldy #$00
+        jsr VIC.WaitForFrame
+        inc COUNTER
+        lda COUNTER
+        and #%00111111
+        bne !-
+
         dec GAME.lives
         bpl !+
         lda #$00
         sta GAME.lives
         rts
     !:
+        lda #$80
+        sta VIC.SCREEN_RAM + $3f8
+        sta VIC.SCREEN_RAM2 + $3f8
+        lda #PLAYER_START_X
+        sta playerX
+
+        lda #$e0
+        sta playerY
+        sta VIC.SPRITE_0_Y
+    !:
+        jsr AnimateTurtle
+        ldy #$00
+        jsr VIC.WaitForFrame
+        inc COUNTER
+        lda COUNTER
+        and #%00000011
+        bne !-
+        ldx playerY
+        dex
+        stx playerY
+        stx VIC.SPRITE_0_Y
+        cpx #PLAYER_START_Y
+        bne !-
+
         lda #IMMORTALITY_TIME
         sta immCount
         lda #GAME.MAX_ENERGY

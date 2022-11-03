@@ -102,9 +102,20 @@ COLLISIONS: {
     }
     
     PlayerBoundaries: {
+        lda #$00 
+        sta PLAYER.onDownLimit
+
         lda PLAYER.playerY
         cmp #$c0
-        bcc !+
+        bcc !++
+        lda PLAYER.onWall
+        beq !+
+        lda PLAYER.onDamage
+        bne !+
+        jsr PLAYER.ApplyDamage
+    !:
+        lda #$01
+        sta PLAYER.onDownLimit
         lda #$c0
         sta PLAYER.playerY
         jmp !++
