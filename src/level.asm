@@ -12,7 +12,7 @@ LEVEL: {
     tmpTile: .byte 00, 00
 
     DrawNextRow: {   
-        .label COL = TMP4
+        .label COL = IRQ_TMP4
 
         set16(Screen.screen_base, Scr + 1)
         lda #<VIC.COLOR_RAM
@@ -278,17 +278,9 @@ LEVEL: {
 
 }
 
-Map:
-	.import binary "./assets/map.bin"
-MapEnd:
-
 Tiles:
 	.import binary "./assets/tiles.bin"
 
 Colors:
 	.import binary "./assets/colors.bin"
 
-* = $7000 "Charset"
-Chars:
-	.import binary "./assets/chars.bin"
-CharsEnd:

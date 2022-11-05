@@ -25,6 +25,21 @@ Start:
     jsr GAME.MainLoop
     rts
 
-* = $6000 "Sprites"
-.import binary "assets/sprites.bin"
+* = $4000 "Screen RAM" virtual
+    .fill $800, 0
 
+* = $6000 "Sprites"
+    .import binary "assets/sprites.bin"
+
+* = $7000 "Charset"
+Chars:
+	.import binary "./assets/chars.bin"
+CharsEnd:
+
+* = $d800 "Color RAM" virtual
+    .fill $400, 0
+
+* = $8000
+Map:
+	.import binary "./assets/map.bin"
+MapEnd:

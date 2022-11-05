@@ -1,6 +1,5 @@
-#import "vic.asm"
 #import "level.asm"
-#import "player.asm"
+* = $2000 "Program CD" 
 #import "collisions.asm"
 #import "controls.asm"
 #import "irq.asm"
