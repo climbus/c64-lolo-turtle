@@ -2,6 +2,7 @@
 * = $2000 "Program CD" 
 #import "collisions.asm"
 #import "controls.asm"
+#import "sound.asm"
 #import "irq.asm"
 
 
@@ -195,3 +196,10 @@ GAME: {
     }
 }
 
+EatSFX:
+    .import binary "assets/test.bin"
+PangSFX:
+    .import binary "assets/pang.bin"
+
+PauseSnd:
+    .byte 00, 00

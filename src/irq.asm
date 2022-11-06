@@ -1,10 +1,13 @@
 IRQ: {
+    .label MUSIC_LINE = 60
     .label START_COPYING_UPPER_COLOR_RAM_LINE = 115
     .label BEGIN_VBLANK_LINE = 250
     .label START_COPYING_LOWER_COLOR_RAM_LINE = 230
     .label START_FOOTER_RAM_LINE = 216
 
     Setup: {  
+        lda #music.startSong - 1
+        jsr music.init
         sei           // disable interrupts
         ldy #$7f      // 01111111 
         sty $dc0d     // turn off CIA timer interrupt
@@ -40,7 +43,6 @@ IRQ: {
         lda GAME.state
         cmp #GAME.STATE_PAUSE
         beq !End+
-        
         lda Screen.vscroll                                  
         cmp #7
         bne !+          
@@ -86,7 +88,6 @@ IRQ: {
     IRQBeginVBlank: {
         IRQStart()
         EnableMulticolorMode()
-
         lda GAME.state
         cmp #GAME.STATE_PAUSE
         beq !+
@@ -94,8 +95,17 @@ IRQ: {
     !:
         lda #$08
         sta VIC.BACKGROUND_COLOR
+        SetRasterInterrupt(MUSIC_LINE, IRQMusic)
+        IRQEnd()
+    }
 
-
+    IRQMusic: {
+        IRQStart()
+        lda GAME.state
+        cmp #GAME.STATE_PAUSE
+        beq !+
+        jsr music.play
+    !:
         lda Screen.vscroll
         cmp #07
         bne !+

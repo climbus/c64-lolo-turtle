@@ -38,8 +38,8 @@ COLLISIONS: {
 
     CheckCollisions: {
         // calculate row and col of player position
-        .label ROW = TMP2
-        .label COL = TMP3
+        .label ROW = TMP4
+        .label COL = TMP5
         
         ldx #06
         ldy #43
@@ -146,6 +146,7 @@ COLLISIONS: {
         sbc #VIC.SCREEN_MSB
         tax
         lda PLAYER.playerScreenPosition
+        jsr SOUND.Eat
         jsr GAME.ShowPoints
         jsr GAME.AddPoints
         lda GAME.energy
@@ -169,6 +170,7 @@ COLLISIONS: {
         lda front_material
         cmp #$01
         bne !+
+        jsr SOUND.Pang
         jsr PLAYER.GoBack
     !:
         lda front_material
@@ -186,6 +188,7 @@ COLLISIONS: {
         lda front_material
         cmp #$08
         bne !+
+        jsr SOUND.Pause
         jsr DIALOG.ShowNext 
     !:
         rts

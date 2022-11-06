@@ -223,14 +223,14 @@ LEVEL: {
     }
 
     SetTailAt: {
-        .label ROW = TMP2
-        .label COL = TMP3
+        .label ROW = TMP8
+        .label COL = TMP9
         txa
         lsr
         asl
         tax
         lda Screen.screen_buffer_nbr
-        beq !+
+        bne !+
         iny
     !:    
         tya
@@ -238,7 +238,7 @@ LEVEL: {
         asl
         tay
         lda Screen.screen_buffer_nbr
-        beq !+
+        bne !+
         dey
     !:    
         stx ROW

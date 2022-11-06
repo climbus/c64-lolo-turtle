@@ -46,9 +46,11 @@ Screen: {
         lda #$00
         sta vscroll
         UpdateScrollRegister(vscroll)
-
-        jsr LEVEL.DrawNextRow
         rts
+    !:
+        cmp #$01
+        bne !+
+        jsr LEVEL.DrawNextRow
     !:
         cmp #$04
         bne !+

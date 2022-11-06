@@ -1,5 +1,7 @@
 #import "zero_page.asm"
 
+.var music = LoadSid("assets/moving.sid")
+
 BasicUpstart2(Start)
 
 #import "macros.asm"
@@ -24,6 +26,9 @@ Start:
     sta COUNTER
     jsr GAME.MainLoop
     rts
+
+* = music.location "Music"
+    .fill music.size, music.getData(i)
 
 * = $4000 "Screen RAM" virtual
     .fill $800, 0
