@@ -55,7 +55,6 @@
 }
 
 .macro IRQStart() {
-    //inc $d020
 	dec $d019
 	pha
 	txa
@@ -70,7 +69,6 @@
 	pla
 	tax
 	pla
-    // dec $d020
 	rti
 }
 
@@ -148,7 +146,7 @@
 }
 
 .macro PrintDebugChar() {
-    lda #$c0
+    lda #$3a
     sta (PLAYER.playerScreenPosition),y
     clc 
     lda PLAYER.playerScreenPosition
