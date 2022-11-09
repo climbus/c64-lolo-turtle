@@ -157,7 +157,7 @@ DIALOG: {
         add16im(colorPtr, 40, colorPtr)
 
         inx
-        cpx #$06
+        cpx #$08
         bne !--
 
         rts
