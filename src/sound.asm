@@ -15,6 +15,14 @@ SOUND: {
         rts
     }
 
+    Water: {
+        lda #<WaterSFX
+        ldy #>WaterSFX 
+        ldx #$07
+        jsr music.init + 6
+        rts
+    }
+
     Pause: {
         lda #<PauseSnd
         ldy #>PauseSnd
@@ -24,9 +32,11 @@ SOUND: {
     }
 
     EatSFX:
-        .import binary "assets/test.bin"
+        .import binary "assets/eat.bin"
     PangSFX:
         .import binary "assets/pang.bin"
+    WaterSFX:
+        .import binary "assets/water.bin"
 
     PauseSnd:
         .byte 00, 00

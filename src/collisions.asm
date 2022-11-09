@@ -158,6 +158,7 @@ COLLISIONS: {
     !:
         cmp #MATERIAL_HURT
         bne !++
+        jsr SOUND.Water
         lda PLAYER.immCount
         bne !+
         jsr PLAYER.ApplyDamage
