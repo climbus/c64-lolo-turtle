@@ -184,7 +184,12 @@ GAME: {
     HidePoints: {
         ldx showPointsCounter
         cpx #$00
-        beq !+
+        beq !++
+            txa
+            and #$01
+            bne !+
+            inc $d028
+        !:
             dex
             stx showPointsCounter
             rts
