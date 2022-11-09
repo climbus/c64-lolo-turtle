@@ -239,7 +239,7 @@ PLAYER: {
         stx playerY
         stx VIC.SPRITE_0_Y
         cpx #PLAYER_START_Y
-        bne !-
+        bcs !-
 
         lda #IMMORTALITY_TIME
         sta immCount
