@@ -247,6 +247,7 @@ LEVEL: {
         jsr SetTail
         ldx ROW
         ldy COL
+        iny
         LoadBufferMSB()
         jsr SetTail
         rts
