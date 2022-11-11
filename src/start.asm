@@ -18,14 +18,16 @@ Start:
     jsr LEVEL.DrawScreen
     jsr HUD.Draw
     jsr PLAYER.Init
-
+    .break
     jsr DIALOG.ShowGetReady
-
+    .break
     jsr IRQ.Setup
     lda #$00
     sta COUNTER
+    lda #GAME.STATE_RUN
+    sta GAME.state
     jsr GAME.MainLoop
-    rts
+    jmp Start
 
 * = music.location "Music"
     .fill music.size, music.getData(i)

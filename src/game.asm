@@ -12,6 +12,7 @@ GAME: {
 
     .label STATE_RUN = $01
     .label STATE_PAUSE = $02
+    .label STATE_END = $04
 
     showPointsCounter: .byte 00
     points: .byte 00, 00, 00, 00
@@ -67,9 +68,6 @@ GAME: {
         lda #MAX_LIVES
         sta lives
 
-        lda #STATE_RUN
-        sta state
-
         lda #$00
         sta DIALOG.lastCounter 
         
@@ -90,6 +88,11 @@ GAME: {
         jsr COLLISIONS.ActFrontCollisions
         jsr COLLISIONS.PlayerBoundaries
         
+        lda state
+        cmp STATE_END
+        bne !+
+        rts
+    !:
         jsr PLAYER.AnimateTurtle
         jsr HidePoints
 
@@ -131,8 +134,9 @@ GAME: {
         //jsr IRQ.ScrollStop
 
         jsr CONTROLS.WaitForFire
-        jmp Start
-
+        
+        lda STATE_END
+        sta state
         rts
     }
 

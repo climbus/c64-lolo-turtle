@@ -41,8 +41,8 @@ IRQ: {
     IRQMiddle: {
         IRQStart()
         lda GAME.state
-        cmp #GAME.STATE_PAUSE
-        beq !End+
+        and #[GAME.STATE_PAUSE + GAME.STATE_END]
+        bne !End+
         lda Screen.vscroll                                  
         cmp #7
         bne !+          
@@ -89,8 +89,8 @@ IRQ: {
         IRQStart()
         EnableMulticolorMode()
         lda GAME.state
-        cmp #GAME.STATE_PAUSE
-        beq !+
+        and #[GAME.STATE_PAUSE + GAME.STATE_END]
+        bne !+
         jsr Screen.ShiftBottom
     !:
         lda #$08
@@ -102,8 +102,8 @@ IRQ: {
     IRQMusic: {
         IRQStart()
         lda GAME.state
-        cmp #GAME.STATE_PAUSE
-        beq !+
+        and #[GAME.STATE_PAUSE + GAME.STATE_END]
+        bne !+
         jsr music.play
     !:
         lda Screen.vscroll
