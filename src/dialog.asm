@@ -22,6 +22,7 @@ DIALOG: {
     
     textLen: .byte $00
     currentText: .word $0000
+    lastCounter: .byte 00
 
     DrawChar: {
         sta (screenPtr),y
@@ -204,8 +205,34 @@ DIALOG: {
         lda #FRAME_R
         jsr DrawChar
         rts
-}
+    }
+    ShowEnd: {
+    !:  // wait for stable scroll
+        lda Screen.vscroll
+        cmp #$06
+        bne !-
+        lda #GAME.STATE_PAUSE
+        sta GAME.state
+        
+        lda #<textLevelComplete - 2
+        sta textPtr
+        lda #>textLevelComplete - 2 
+        sta textPtr + 1
+
+        lda #DEFAULT_TEXT_LEN
+        sta textLen
+        jsr ShowText
+        jsr CONTROLS.WaitForFire        
+        jsr HideText
+        set16(textPtr, currentText)
+
+        lda #GAME.STATE_RUN
+        sta GAME.state
+        rts
+    }
+
     ShowGetReady: {
+        .break
         lda #<textGetReady - 2
         sta textPtr
         lda #>textGetReady - 2 
@@ -218,11 +245,16 @@ DIALOG: {
         jsr CONTROLS.WaitForFire        
         jsr HideText
 
-        set16(textPtr, currentText)
+        lda #<textEat - 2
+        sta currentText
+        lda #>textEat - 2 
+        sta currentText + 1
         rts
     }
 
     ShowNext: {
+        lda COUNTER
+        sta lastCounter
     !:  // wait for stable scroll
         lda Screen.vscroll
         cmp #$06

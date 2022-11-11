@@ -69,6 +69,15 @@ GAME: {
 
         lda #STATE_RUN
         sta state
+
+        lda #$00
+        sta DIALOG.lastCounter 
+        
+        lda #$00
+        sta points
+        sta points + 1
+        sta points + 2
+        sta points + 3
         rts
     }
 
@@ -109,19 +118,18 @@ GAME: {
         bne !+
         jsr PLAYER.Die
     !:
+        lda COUNTER
+        bne !+
+        sta DIALOG.lastCounter
+    !:
         jmp MainLoop
     
         rts
     }
 
     Restart: {
-        jsr IRQ.ScrollStop
+        //jsr IRQ.ScrollStop
 
-        lda #$00
-        sta points
-        sta points + 1
-        sta points + 2
-        sta points + 3
         jsr CONTROLS.WaitForFire
         jmp Start
 

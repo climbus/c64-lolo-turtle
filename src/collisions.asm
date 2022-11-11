@@ -177,7 +177,7 @@ COLLISIONS: {
         lda front_material
         cmp #$0f
         bne !+
-        jsr DIALOG.ShowNext
+        jsr DIALOG.ShowEnd
         lda #GAME.STATE_PAUSE
         sta GAME.state
         
@@ -189,6 +189,11 @@ COLLISIONS: {
         lda front_material
         cmp #$08
         bne !+
+        lda COUNTER
+        sec
+        sbc #$0f
+        cmp DIALOG.lastCounter
+        bcc !+
         jsr SOUND.Pause
         jsr DIALOG.ShowNext 
     !:
