@@ -17,7 +17,6 @@ DIALOG: {
     .label screenPtr = TMP4
     .label bufferPtr = TMP8
     .label colorPtr = TMP6
-    .label colorTMPPtr = TMP10
     .label textPos = $00
     
     textLen:     .byte $00
@@ -27,9 +26,6 @@ DIALOG: {
 
     DrawChar: {
         sta (screenPtr),y
-        
-        lda (colorPtr),y
-        sta (colorTMPPtr),y
 
         lda #DIALOG_COLOR
         sta (colorPtr),y
@@ -43,10 +39,6 @@ DIALOG: {
         lda #$00 
         sta lines
 
-        lda #<colorTMP
-        sta colorTMPPtr
-        lda #>colorTMP
-        sta colorTMPPtr + 1
         ldy #$00
         lda #FRAME_UL
         jsr DrawChar
@@ -312,7 +304,5 @@ DIALOG: {
     textEat: .text @"MUSISZ JESC \n  ABY MIEC  \n    SILE    \$ff"
     textWater: .text @"   UWAZAJ   \n   NA WODE  \$ff"
     textLevelComplete: .text @"   POZIOM   \n UKONCZONY  \$ff"
-
-    colorTMP: .fill 12*10,0
 }
 
