@@ -20,9 +20,10 @@ DIALOG: {
     .label colorTMPPtr = TMP10
     .label textPos = $00
     
-    textLen: .byte $00
+    textLen:     .byte $00
     currentText: .word $0000
     lastCounter: .byte 00
+    lines:       .byte 00
 
     DrawChar: {
         sta (screenPtr),y
@@ -39,6 +40,9 @@ DIALOG: {
     ShowText: {
         jsr SetDialogStart
         
+        lda #$00 
+        sta lines
+
         lda #<colorTMP
         sta colorTMPPtr
         lda #>colorTMP
@@ -58,8 +62,12 @@ DIALOG: {
         lda #FRAME_UR
         jsr DrawChar
 
+        inc lines
+
         jsr SpaceLine
-    
+
+        inc lines
+
         add16im(screenPtr, 40, screenPtr)
         add16im(colorPtr, 40, colorPtr)
     !TextLine:
@@ -89,11 +97,12 @@ DIALOG: {
         add16im(textPtr, DEFAULT_TEXT_LEN - 1, textPtr)
         add16im(screenPtr, 40, screenPtr)
         add16im(colorPtr, 40, colorPtr)
+        inc lines
         jmp !TextLine-
     !:
         add16im(textPtr, DEFAULT_TEXT_LEN - 1, textPtr)
         jsr SpaceLine
-
+        inc lines
         add16im(screenPtr, 40, screenPtr)
         add16im(colorPtr, 40, colorPtr)
 
@@ -111,6 +120,27 @@ DIALOG: {
         jsr DrawChar
         lda #FRAME_DR
         jsr DrawChar
+        inc lines
+        inc lines
+        rts
+    }
+
+    HideGetReady: {
+        jsr SetDialogStart
+
+        ldx #$00
+    !:
+        ldy #$00
+    !:
+        lda #$00
+        sta (screenPtr),y
+        iny
+        cpy #18
+        bne !-
+        add16im(screenPtr, 40, screenPtr)
+        inx
+        cpx #DEFAULT_TEXT_LEN
+        bne !--
         rts
     }
 
@@ -158,9 +188,8 @@ DIALOG: {
         add16im(colorPtr, 40, colorPtr)
 
         inx
-        cpx #$08
+        cpx lines
         bne !--
-
         rts
     }
     
@@ -206,6 +235,7 @@ DIALOG: {
         jsr DrawChar
         rts
     }
+
     ShowEnd: {
     !:  // wait for stable scroll
         lda Screen.vscroll
@@ -232,7 +262,8 @@ DIALOG: {
     }
 
     ShowGetReady: {
-        .break
+        lda #GAME.STATE_PAUSE
+        sta GAME.state
         lda #<textGetReady - 2
         sta textPtr
         lda #>textGetReady - 2 
@@ -243,12 +274,14 @@ DIALOG: {
 
         jsr ShowText
         jsr CONTROLS.WaitForFire        
-        jsr HideText
+        jsr HideGetReady
 
         lda #<textEat - 2
         sta currentText
         lda #>textEat - 2 
         sta currentText + 1
+        lda #GAME.STATE_RUN
+        sta GAME.state
         rts
     }
 

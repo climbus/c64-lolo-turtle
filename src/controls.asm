@@ -55,6 +55,10 @@ CONTROLS: {
         lda JOY_PORT_2
         and #$10 
         bne !-
+    !:
+        lda JOY_PORT_2
+        and #$10 
+        beq !-
         rts
     }
 

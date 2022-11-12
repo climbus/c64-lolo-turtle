@@ -132,6 +132,8 @@ GAME: {
 
     Restart: {
         //jsr IRQ.ScrollStop
+        lda #$01
+        sta $d01a     // enable VIC-II Raster Beam IRQ
 
         jsr CONTROLS.WaitForFire
         

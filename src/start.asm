@@ -18,10 +18,10 @@ Start:
     jsr LEVEL.DrawScreen
     jsr HUD.Draw
     jsr PLAYER.Init
-    .break
-    jsr DIALOG.ShowGetReady
-    .break
+    lda #GAME.STATE_PAUSE
+    sta GAME.state
     jsr IRQ.Setup
+    jsr DIALOG.ShowGetReady
     lda #$00
     sta COUNTER
     lda #GAME.STATE_RUN
