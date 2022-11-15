@@ -48,5 +48,8 @@ CharsEnd:
 
 * = $8000
 Map:
-	.import binary "./assets/map.bin"
+	.import binary "./assets/map1.bin"
 MapEnd:
+Map2:
+    .import binary "./assets/map2.bin"
+MapEnd2:
