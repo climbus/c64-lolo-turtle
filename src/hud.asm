@@ -3,11 +3,11 @@ HUD: {
     .const CHAR_COUNT = 120
 
     .const POINTS_START_ADDR = $378
-    .const DIGITS_START_CHAR = $8e
+    .const DIGITS_START_CHAR = $b0
     .const ENERGY_START_ADDR = $387
-    .const HEART_CHAR = $98
+    .const HEART_CHAR = $ba
     .const LIVES_START_ADDR = $393
-    .const LIVES_CHAR = $99
+    .const LIVES_CHAR = $bb
 
     decPoints: .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
     hexPoints: .byte 00, 00, 00, 00

@@ -3,14 +3,15 @@ DIALOG: {
     .const DEFAULT_COL = 12
     .const DEFAULT_TEXT_LEN = 14
     
-    .label FRAME_UL = $9a
-    .label FRAME_DL = $9f
-    .label FRAME_UR = $9d
-    .label FRAME_DR = $a1
-    .label FRAME_U = $9b
-    .label FRAME_D = $a0
-    .label FRAME_L = $9c
-    .label FRAME_R = $9e
+    .label FIRST_FRAME_CHAR = $bc
+    .label FRAME_UL = FIRST_FRAME_CHAR 
+    .label FRAME_U = FIRST_FRAME_CHAR + 1
+    .label FRAME_L = FIRST_FRAME_CHAR + 2
+    .label FRAME_UR = FIRST_FRAME_CHAR + 3
+    .label FRAME_R = FIRST_FRAME_CHAR + 4
+    .label FRAME_DL = FIRST_FRAME_CHAR + 5
+    .label FRAME_D = FIRST_FRAME_CHAR + 6
+    .label FRAME_DR = FIRST_FRAME_CHAR + 7
     .label DIALOG_COLOR = $01
 
     .label textPtr = TMP2 
@@ -75,7 +76,8 @@ DIALOG: {
         cmp #$cd
         beq !+
         clc
-        adc #$33
+        adc #[$96 - $41]
+        .break
         jsr DrawChar
         jmp !-
     !:
