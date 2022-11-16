@@ -104,6 +104,23 @@ LEVEL: {
         rts
     }
 
+
+    DrawLevel1: {
+        lda #<MapEnd - 1
+        sta DrawRows.Tile + 1
+        lda #>MapEnd - 1
+        sta DrawRows.Tile + 2
+        jmp DrawScreen
+    }
+
+    DrawLevel2: {
+        lda #<MapEnd2 - 1
+        sta DrawRows.Tile + 1
+        lda #>MapEnd2 - 1
+        sta DrawRows.Tile + 2
+        jmp DrawScreen
+    }
+
     // screen draw start
     // color draw start
     // num rows
@@ -117,11 +134,6 @@ LEVEL: {
         sta DrawRows.Scr + 2
         lda #>VIC.COLOR_RAM + $03e7 - [40 * 6] - 1
         sta DrawRows.Color + 2
-
-        lda #<MapEnd - 1
-        sta DrawRows.Tile + 1
-        lda #>MapEnd - 1
-        sta DrawRows.Tile + 2
     }
 
     DrawRows: { 

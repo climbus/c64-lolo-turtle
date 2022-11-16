@@ -15,7 +15,7 @@ BasicUpstart2(Start)
 Start:
     jsr GAME.Init
     jsr Screen.Init
-    jsr LEVEL.DrawScreen
+    jsr LEVEL.DrawLevel1
     jsr HUD.Draw
     jsr PLAYER.Init
     lda #GAME.STATE_PAUSE
