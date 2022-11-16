@@ -178,6 +178,7 @@ COLLISIONS: {
         cmp #$0f
         bne !+
         jsr GAME.EndLevel
+        rts
     !:
         jsr PLAYER.ClearDamage
 

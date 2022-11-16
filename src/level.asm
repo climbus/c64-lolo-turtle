@@ -104,6 +104,9 @@ LEVEL: {
         rts
     }
 
+    DrawNext: {
+        jmp DrawLevel2
+    }
 
     DrawLevel1: {
         lda #<MapEnd - 1
@@ -295,5 +298,4 @@ Tiles:
 	.import binary "./assets/tiles.bin"
 
 Colors:
-	.import binary "./assets/colors.bin"
-
+	.import binary "./assets/colors1.bin"

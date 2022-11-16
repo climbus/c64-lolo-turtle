@@ -220,7 +220,14 @@ GAME: {
         sta GAME.state
         
         jsr PLAYER.GoToEnd
-        jsr GAME.Restart     
+
+        jsr CONTROLS.WaitForFire
+        
+        jsr Screen.Init
+        jsr LEVEL.DrawNext     
+        jsr PLAYER.Init
+        
+        jsr DIALOG.ShowGetReady
         rts
     }
 
