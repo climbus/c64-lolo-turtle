@@ -177,12 +177,7 @@ COLLISIONS: {
         lda front_material
         cmp #$0f
         bne !+
-        jsr DIALOG.ShowEnd
-        lda #GAME.STATE_PAUSE
-        sta GAME.state
-        
-        jsr PLAYER.GoToEnd
-        jsr GAME.Restart     
+        jsr GAME.EndLevel
     !:
         jsr PLAYER.ClearDamage
 

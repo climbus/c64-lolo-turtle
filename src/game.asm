@@ -213,6 +213,17 @@ GAME: {
         sta VIC.ENABLE_SPRITE_REGISTER
         rts
     }
+
+    EndLevel: {
+        jsr DIALOG.ShowEnd
+        lda #GAME.STATE_PAUSE
+        sta GAME.state
+        
+        jsr PLAYER.GoToEnd
+        jsr GAME.Restart     
+        rts
+    }
+
 }
 
 EatSFX:
