@@ -200,15 +200,27 @@ PLAYER: {
     }
 
     Die: {
-        lda #$84
-        sta VIC.SCREEN_RAM + $3f8
-        sta VIC.SCREEN_RAM2 + $3f8
+        ldx #$83
+    !:
+        stx VIC.SCREEN_RAM + $3f8
+        stx VIC.SCREEN_RAM2 + $3f8
+        inx
     !:
         ldy #$00
         jsr VIC.WaitForFrame
         inc COUNTER
         lda COUNTER
-        and #%00111111
+        and #%00001111
+        bne !-
+        cpx #$86
+        bne !--
+
+    !:
+        ldy #$00
+        jsr VIC.WaitForFrame
+        inc COUNTER
+        lda COUNTER
+        and #%00011111
         bne !-
 
         dec GAME.lives
