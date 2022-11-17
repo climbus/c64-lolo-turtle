@@ -200,6 +200,7 @@ PLAYER: {
     }
 
     Die: {
+        jsr SOUND.Dead
         ldx #$83
     !:
         stx VIC.SCREEN_RAM + $3f8

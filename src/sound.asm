@@ -7,6 +7,14 @@ SOUND: {
         rts
     }
 
+    Dead: {
+        lda #<DeadSFX
+        ldy #>DeadSFX
+        ldx #$07
+        jsr music.init + 6
+        rts
+    }
+
     Eat: {
         lda #<EatSFX
         ldy #>EatSFX 
@@ -35,6 +43,8 @@ SOUND: {
         .import binary "assets/eat.bin"
     PangSFX:
         .import binary "assets/pang.bin"
+    DeadSFX:
+        .import binary "assets/dead.bin"
     WaterSFX:
         .import binary "assets/water.bin"
 
