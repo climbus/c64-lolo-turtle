@@ -25,6 +25,9 @@ Screen: {
         lda #$00
         sta vscroll
         sta screen_buffer_nbr
+        lda VIC.MEMORY_SETUP_REGISTER
+        and #$0f                  
+        sta VIC.MEMORY_SETUP_REGISTER
         rts
     }
 
