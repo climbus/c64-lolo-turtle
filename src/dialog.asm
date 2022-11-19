@@ -77,7 +77,6 @@ DIALOG: {
         beq !+
         clc
         adc #[$96 - $41]
-        .break
         jsr DrawChar
         jmp !-
     !:

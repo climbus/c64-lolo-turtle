@@ -1,4 +1,5 @@
 LEVEL: {
+
     .label SCREEN_POS = TMP2
 
     TileScreenLocations2x2: 
@@ -105,10 +106,15 @@ LEVEL: {
     }
 
     DrawNext: {
-        jmp DrawLevel2
+        jmp $beef
     }
 
     DrawLevel1: {
+        lda #<DrawLevel2
+        sta DrawNext + 1
+        lda #>DrawLevel2
+        sta DrawNext + 2
+
         lda #<MapEnd - 1
         sta DrawRows.Tile + 1
         lda #>MapEnd - 1
@@ -117,6 +123,20 @@ LEVEL: {
     }
 
     DrawLevel2: {
+        lda #<DrawLevel3
+        sta DrawNext + 1
+        lda #>DrawLevel3
+        sta DrawNext + 2
+
+        lda #<MapEnd2 - 1
+        sta DrawRows.Tile + 1
+        lda #>MapEnd2 - 1
+        sta DrawRows.Tile + 2
+        jmp DrawScreen
+    }
+    
+    DrawLevel3: {
+        .break
         lda #<MapEnd2 - 1
         sta DrawRows.Tile + 1
         lda #>MapEnd2 - 1

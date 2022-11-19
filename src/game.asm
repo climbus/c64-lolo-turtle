@@ -226,7 +226,6 @@ GAME: {
         jsr Screen.Init
         jsr LEVEL.DrawNext     
         jsr PLAYER.Init
-        
         jsr DIALOG.ShowGetReady
         rts
     }
