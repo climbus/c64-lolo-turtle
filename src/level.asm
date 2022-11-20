@@ -136,7 +136,6 @@ LEVEL: {
     }
     
     DrawLevel3: {
-        .break
         lda #<MapEnd2 - 1
         sta DrawRows.Tile + 1
         lda #>MapEnd2 - 1

@@ -15,6 +15,9 @@ HUD: {
 
     Draw: {
         jsr ShowPointsLabel
+        jsr ShowPoints
+        jsr ShowEnergy
+        jsr ShowLives
         rts
     }
 

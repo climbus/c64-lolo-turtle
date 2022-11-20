@@ -223,9 +223,12 @@ GAME: {
 
         jsr CONTROLS.WaitForFire
         
+        lda #MAX_ENERGY
+        sta energy
         jsr Screen.Init
         jsr LEVEL.DrawNext     
         jsr PLAYER.Init
+        jsr HUD.ShowEnergy
         jsr DIALOG.ShowGetReady
         rts
     }
