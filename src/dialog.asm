@@ -75,8 +75,7 @@ DIALOG: {
         beq !+
         cmp #$cd
         beq !+
-        clc
-        adc #[$96 - $41]
+        AtoChar()
         jsr DrawChar
         jmp !-
     !:
