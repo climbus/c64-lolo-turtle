@@ -93,6 +93,7 @@ IRQ: {
         bne !+
         jsr Screen.ShiftBottom
     !:
+        UpdateScrollRegister(Screen.vscroll)
         lda #$08
         sta VIC.BACKGROUND_COLOR
         SetRasterInterrupt(MUSIC_LINE, IRQMusic)

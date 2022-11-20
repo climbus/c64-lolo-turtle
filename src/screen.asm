@@ -23,8 +23,10 @@ Screen: {
         add16im(screen_ptr, 40*25, screen_ptr)
         set16im($d800, color_ptr)
         lda #$00
-        sta vscroll
         sta screen_buffer_nbr
+        lda #$00
+        sta vscroll
+        UpdateScrollRegister(vscroll)
         lda VIC.MEMORY_SETUP_REGISTER
         and #$0f                  
         sta VIC.MEMORY_SETUP_REGISTER
@@ -63,10 +65,6 @@ Screen: {
         bne !+
         jsr CharsShiftLower
     !:
-        UpdateScrollRegister(vscroll)
-        lda #$08
-        sta VIC.BACKGROUND_COLOR
-
         rts
     }
 
