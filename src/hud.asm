@@ -2,6 +2,7 @@ HUD: {
     .const START_CHAR = 40 * 21
     .const CHAR_COUNT = 120
 
+    .const POINTS_LINE = 22
     .const POINTS_START_ADDR = $378
     .const DIGITS_START_CHAR = $b0
     .const ENERGY_START_ADDR = $387
@@ -13,7 +14,8 @@ HUD: {
     hexPoints: .byte 00, 00, 00, 00
 
     Draw: {
-
+        jsr ShowPointsLabel
+        rts
         ldy #00
     !:
         lda HudMap,y
@@ -25,6 +27,23 @@ HUD: {
         iny
         cpy #CHAR_COUNT
         bne !-
+        rts
+    }
+
+    ShowPointsLabel: {
+        ldy #$00
+    !:
+        lda textPointsLabel,y
+        cmp #$ff
+        beq !+
+        AtoChar()
+        sta VIC.SCREEN_RAM + [POINTS_LINE * 40 + 1],y
+        sta VIC.SCREEN_RAM2 + [POINTS_LINE * 40 + 1],y
+        lda #$01
+        sta VIC.COLOR_RAM + [POINTS_LINE * 40 + 1],y
+        iny
+        jmp !-
+    !:
         rts
     }
 
@@ -126,6 +145,9 @@ HUD: {
         bpl !Loop-
         rts
     }
+    
+    #importif PL "txt/labels_pl.asm"
+    #importif EN "txt/labels_en.asm"
 }
 
 HudMap:

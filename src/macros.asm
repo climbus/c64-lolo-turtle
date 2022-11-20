@@ -1,6 +1,10 @@
 // Constants
 .label SYSTEM_IRQ_VECTOR = $fffe
 
+.macro AtoChar() {
+    clc
+    adc #[$96 - $41]
+}
 
 .macro set16im(value, dest) {                                   // store a 16bit constant to a memory location
     lda #<value

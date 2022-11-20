@@ -1,0 +1,1 @@
+textPointsLabel:    .text @"PUNKTY\$ff"
