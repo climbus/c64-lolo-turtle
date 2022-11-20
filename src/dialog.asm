@@ -300,10 +300,8 @@ DIALOG: {
         sta GAME.state
         rts
     }
-
-    textGetReady: .text @" GET READY  \$ff"
-    textEat: .text @"MUSISZ JESC \n  ABY MIEC  \n    SILE    \$ff"
-    textWater: .text @"   UWAZAJ   \n   NA WODE  \$ff"
-    textLevelComplete: .text @"   POZIOM   \n UKONCZONY  \$ff"
+    
+    #importif PL "txt/dialogs_pl.asm"
+    #importif EN "txt/dialogs_en.asm"
 }
 

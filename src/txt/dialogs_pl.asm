@@ -1,0 +1,8 @@
+textGetReady:       .text @" GET READY  \$ff"
+textEat:            .text @"MUSISZ JESC \n"
+                    .text @"  ABY MIEC  \n"
+                    .text @"    SILE    \$ff"
+textWater:          .text @"   UWAZAJ   \n"
+                    .text @"   NA WODE  \$ff"
+textLevelComplete:  .text @"   POZIOM   \n"
+                    .text @" UKONCZONY  \$ff"

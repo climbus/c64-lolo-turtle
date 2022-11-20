@@ -1,0 +1,8 @@
+textGetReady:       .text @" GET READY  \$ff"
+textEat:            .text @"YOU MUST EAT\n"
+                    .text @"   TO BE    \n"
+                    .text @"   STRONG   \$ff"
+textWater:          .text @" WATCH OUT  \n"
+                    .text @" FOR WATER  \$ff"
+textLevelComplete:  .text @"    LEVEL   \n"
+                    .text @"  COMPLETED \$ff"
