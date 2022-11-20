@@ -16,18 +16,6 @@ HUD: {
     Draw: {
         jsr ShowPointsLabel
         rts
-        ldy #00
-    !:
-        lda HudMap,y
-        sta VIC.SCREEN_RAM + START_CHAR,y
-        sta VIC.SCREEN_RAM2 + START_CHAR,y
-        tax
-        lda HudColors,x
-        sta VIC.COLOR_RAM + START_CHAR,y
-        iny
-        cpy #CHAR_COUNT
-        bne !-
-        rts
     }
 
     ShowPointsLabel: {
